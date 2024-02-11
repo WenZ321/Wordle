@@ -2,16 +2,26 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   height: 100vh;
+  margin: 0;
+  padding: 0;
   font-family: Arial, sans-serif;
 }
 
-#wordleGrid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
+h1 {
+  text-align: center; 
+  margin-top: 0; 
+  padding: 20px 0; 
+  background-color: #ffffff; 
+  color: #ff0000; 
+  font-family: Arial, sans-serif; 
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
+
 
 .guess {
   display: flex;
@@ -25,4 +35,25 @@ body, html {
 
 #guessInput {
   margin-right: 10px;
+}
+
+.wordle-grid {
+  display: grid;
+    grid-template-columns: repeat(5, 60px); 
+    grid-template-rows: repeat(5, 60px); 
+    gap: 10px; 
+    justify-content: center; 
+    margin-top: -200px; 
+    padding: 10px;
+}
+.wordle-box {
+  width: 60px;
+  height: 60px;
+  border: 2px solid #787c7e; /* Gray border */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32px;
+  font-weight: bold;
+  color: #000; /* Black text, if needed */
 }
