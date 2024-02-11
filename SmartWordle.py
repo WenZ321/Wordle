@@ -25,6 +25,7 @@ def GenerateInitalBoxes(initialWord):
 
 boxes = GenerateInitalBoxes("HELLO")
 currentLine = 2
+print(boxes)
 
 
 # Guessing mechanic
@@ -35,13 +36,12 @@ def guessing(wordGuessed):
     for x in range(5):
         line += box.replace("Letter", word[x])
     return line
-
+'''
 # If  player enters a guess, replace the current line with a new line 
 replaceLine = guessing("Never")
 temp = boxes.split("\n")
 temp[currentLine] = replaceLine
 boxes = "\n".join(temp)
 currentLine += 1
+'''
 
-
-print(boxes)

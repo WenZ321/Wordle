@@ -11,9 +11,18 @@
     </head>
     <body>
         <h1> Smart Wordle </h1>
-        <py-script src = "SmartWordle.py"></py-script>
+        <div class="wordle-grid">
+            <div class="wordle-box"> H </div><div class="wordle-box"> E </div><div class="wordle-box"> L </div><div class="wordle-box"> L </div><div class="wordle-box"> O </div>
+            <div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div>
+            <div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div>
+            <div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div>
+            <div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div>
+        </div>
+        <!-- Doesn't work yet-->
+        <py-script src = "SmartWordle.py">
+        </py-script>
         <input type="text" id="guessInput" maxlength="5" />
         <button onclick="submitGuess()">Submit Guess</button>
-        <script src="script.js"></script>
+
     </body>
 </html>
