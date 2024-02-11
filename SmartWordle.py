@@ -1,11 +1,8 @@
 import random
 
 # Creates bank of words
-
 file = open("words.txt", "r")
-
 words = []
-
 for line in file:
     words.append(line.strip())
 file.close()
@@ -14,6 +11,7 @@ file.close()
 def GenerateWord():
     return words[random.randint(0, len(words))]
 
+# Generates a random word
 word = GenerateWord()
 
 # Creates a dictionary of the indexes and the character at that index for the word the user is trying to guess
