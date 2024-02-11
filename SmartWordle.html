@@ -1,97 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Wordle Game</title>
-        <link rel="stylesheet" href="style.css">
-        <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/pyscript.css" />
-        <script defer src="https://pyscript.net/releases/2024.1.1/pyscript.js"></script>
-        
-    </head>
-    <body>
-        <h1> Smart Wordle </h1>
-        <div class="wordle-grid">
-            <div class="wordle-box"> H </div><div class="wordle-box"> E </div><div class="wordle-box"> L </div><div class="wordle-box"> L </div><div class="wordle-box"> O </div>
-            <div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div>
-            <div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div>
-            <div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div>
-            <div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div>
-        </div>
-        <!-- Doesn't work yet-->
-        <py-script src = "SmartWordle.py">
-        </py-script>
-        <div id="message" style="color: red; margin-bottom: 10px;"></div>
-        <input type="text" id="guessInput" maxlength="5" />
-        <button onclick="submitGuess()">Submit Guess</button>
-        <div id="keyboard">
-            <div class="keyboard-row">
-                <button class="key">Q</button>
-                <button class="key">W</button>
-                <button class="key">E</button>
-                <button class="key">R</button>
-                <button class="key">T</button>
-                <button class="key">Y</button>
-                <button class="key">U</button>
-                <button class="key">I</button>
-                <button class="key">O</button>
-                <button class="key">P</button>
-            </div>
-            <div class="keyboard-row">
-                <button class="key">A</button>
-                <button class="key">S</button>
-                <button class="key">D</button>
-                <button class="key">F</button>
-                <button class="key">G</button>
-                <button class="key">H</button>
-                <button class="key">J</button>
-                <button class="key">K</button>
-                <button class="key">L</button>
-            </div>
-            <div class="keyboard-row">
-                <button class="key" id="enter">Enter</button>
-                <button class="key">Z</button>
-                <button class="key">X</button>
-                <button class="key">C</button>
-                <button class="key">V</button>
-                <button class="key">B</button>
-                <button class="key">N</button>
-                <button class="key">M</button>
-                <button class="key" id="backspace">←</button>
-            </div>
-        </div>
-        <script>
-            document.querySelectorAll('.key').forEach(button => {
-                button.addEventListener('click', function() {
-                    const key = this.textContent;
-                    const input = document.getElementById('guessInput');
-                    const message = document.getElementById('message');
-                    if (key === 'Enter') {
-                        if (input.value.length < 5) {
-                            
-                            message.textContent = "The word is too short. Please enter a 5-letter word.";
-                        } else {
-                            
-                            message.textContent = '';
-                            submitGuess();
-                        }
-                    } else if (key === '←') {
-                        input.value = input.value.slice(0, -1);
-                    } else if (input.value.length < 5) {
-                        input.value += key.length === 1 ? key : '';
-                        
-                        message.textContent = '';
-                    }
-                });
-            });
-        
-            function submitGuess() {
-               
-                console.log("Submit guess here");
-                
-                document.getElementById('guessInput').value = '';
-            }
-        </script>
-        
-    </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle Game</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/pyscript.css" />
+    <script defer src="https://pyscript.net/releases/2024.1.1/pyscript.js"></script>
+</head>
+<body>
+    <h1>Smart Wordle</h1>
+    <div class="wordle-grid"></div>
+    <div id="message" style="color: red; margin-bottom: 10px;"></div>
+    <input type="text" id="guessInput" maxlength="5" placeholder="Enter guess here..." />
+    <button onclick="submitGuess()">Submit Guess</button>
+    <div id="keyboard"></div>
+    <script src="script.js"></script>
+</body>
 </html>
