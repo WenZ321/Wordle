@@ -1,3 +1,13 @@
+# Creates bank of words
+
+file = open("words.txt", "r")
+
+words = []
+
+for line in file:
+    words.append(line.strip())
+file.close()
+
 # Generating a random word to pass into GenerateInitalBoxes
 def GenerateWord():
     return ""
