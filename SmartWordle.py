@@ -1,3 +1,5 @@
+import random
+
 # Creates bank of words
 
 file = open("words.txt", "r")
@@ -10,7 +12,28 @@ file.close()
 
 # Generating a random word to pass into GenerateInitalBoxes
 def GenerateWord():
-    return ""
+    return words[random.randint(0, len(words))]
+
+word = GenerateWord()
+
+# Creates a dictionary of the indexes and the character at that index for the word the user is trying to guess
+word_letters = {index: letter for index, letter in enumerate(word)}
+
+# Returns an array of strings specifying the colors assigned to each box in given order
+def process_guess(guess):
+    # Creates another dictionary that is similar to word_letters, but for the guessed word
+    guess_letters = {index: letter for index, letter in enumerate(guess)}
+    placements = []
+    # Assigns colors to the letters
+    for i in range(len(guess_letters)):
+        if guess_letters[i] in word_letters.values():
+            if guess_letters[i] == word_letters[i]:
+                placements.append("green")
+            else:
+                placements.append("yellow")
+        else:
+            placements.append("gray")
+    return placements
 
 def GenerateInitalBoxes(initialWord):
     word = initialWord.upper()
