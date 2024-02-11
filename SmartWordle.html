@@ -5,17 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Wordle Game</title>
         <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/pyscript.css" />
+        <script defer src="https://pyscript.net/releases/2024.1.1/pyscript.js"></script>
+        
     </head>
     <body>
         <h1> Smart Wordle </h1>
-        <div class="wordle-grid">
-            <!-- 5x5 grid of empty boxes -->
-            <div class="wordle-box">H</div><div class="wordle-box">E</div><div class="wordle-box">L</div><div class="wordle-box">L</div><div class="wordle-box">O</div>
-            <div class="wordle-box"></div><div class="wordle-box"></div><div class="wordle-box"></div><div class="wordle-box"></div><div class="wordle-box"></div>
-            <div class="wordle-box"></div><div class="wordle-box"></div><div class="wordle-box"></div><div class="wordle-box"></div><div class="wordle-box"></div>
-            <div class="wordle-box"></div><div class="wordle-box"></div><div class="wordle-box"></div><div class="wordle-box"></div><div class="wordle-box"></div>
-            <div class="wordle-box"></div><div class="wordle-box"></div><div class="wordle-box"></div><div class="wordle-box"></div><div class="wordle-box"></div>
-        </div>
+        <py-script src = "SmartWordle.py"></py-script>
         <input type="text" id="guessInput" maxlength="5" />
         <button onclick="submitGuess()">Submit Guess</button>
         <script src="script.js"></script>
