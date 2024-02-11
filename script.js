@@ -4,14 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('guessInput');
     const message = document.getElementById('message');
     
-    
     for (let i = 0; i < 30; i++) {
         const box = document.createElement('div');
         box.className = 'wordle-box';
         grid.appendChild(box);
     }
 
-    
     const layout = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM←"];
     layout.forEach((row, index) => {
         const rowDiv = document.createElement('div');
@@ -33,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
         keyboard.appendChild(rowDiv);
     });
 
-    
     function handleKeyPress(key) {
         if (key === 'Enter') {
             submitGuess();
@@ -47,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.submitGuess = () => {
         const guess = input.value.toUpperCase();
         if (guess.length === 5) {
-            
             console.log("Guess submitted: ", guess);
             input.value = ''; 
             message.textContent = ''; 
