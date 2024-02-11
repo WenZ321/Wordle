@@ -1,20 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wordle Game</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/pyscript.css" />
-    <script defer src="https://pyscript.net/releases/2024.1.1/pyscript.js"></script>
-</head>
-<body>
-    <h1>Smart Wordle</h1>
-    <div class="wordle-grid"></div>
-    <div id="message" style="color: red; margin-bottom: 10px;"></div>
-    <input type="text" id="guessInput" maxlength="5" placeholder="Enter guess here..." />
-    <button onclick="submitGuess()">Submit Guess</button>
-    <div id="keyboard"></div>
-    <script src="script.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wordle Game</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/pyscript.css" />
+        <script defer src="https://pyscript.net/releases/2024.1.1/pyscript.js"></script>
+    </head>
+    <body>
+        <h1>Smart Wordle</h1>
+        <div class="wordle-grid"></div>
+        <div class="wordle-grid">
+            <div class="wordle-box"> H </div><div class="wordle-box"> E </div><div class="wordle-box"> L </div><div class="wordle-box"> L </div><div class="wordle-box"> O </div>
+            <div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div>
+            <div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div>
+            <div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div>
+            <div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div><div class="wordle-box">   </div>
+        </div>
+        <!-- Doesn't work yet-->
+        <py-script src = "SmartWordle.py">
+        <div id="message" style="color: red; margin-bottom: 10px;"></div>
+        <input type="text" id="guessInput" maxlength="5" placeholder="Enter guess here..." />
+        <button onclick="submitGuess()">Submit Guess</button>
+        <div id="keyboard"></div>
+        <script src="script.js"></script>
+    </body>
 </html>
