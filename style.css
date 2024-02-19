@@ -61,7 +61,7 @@ h1 {
 .wordle-grid {
   display: grid;
     grid-template-columns: repeat(5, 60px); 
-    grid-template-rows: repeat(5, 60px); 
+    grid-template-rows: repeat(6, 60px); 
     gap: 10px; 
     justify-content: center; 
     margin-top: -200px; 
