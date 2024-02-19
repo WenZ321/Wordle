@@ -18,8 +18,14 @@ document.addEventListener('DOMContentLoaded', () => {
         "teach", "unity", "valor", "worry", "xerox", 
         "yield", "zesty"
     ];
+    
+    for(let i = 0; i < wordsArray.length; i++){
+        wordsArray[i] = wordsArray[i].toUpperCase();
+    }
 
-    /* reading file
+    const lettersGuessed = [];
+
+    /* reading file (doesnt quite work yet)
     const fs = require("fs");
     const path = require("path");
 
@@ -92,22 +98,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.submitGuess = () => {
         const guess = input.value.toUpperCase();
-        if(wordsArray)
 
+        message.textContent = "";
 
-        if (guess.length === 5) {
-            console.log("Guess submitted: ", guess);
-            displayGuessOnGrid(guess)
-            if(guess === randomWord){
-                message.textContent = "You win!";
-            } else {
-                input.value = ''; 
-                message.textContent = ''; 
-                currentAttempt++;
-            }
-        } else {
+        if (guess.length !== 5) {
             message.textContent = "Please enter a 5-letter word.";
+            return; 
         }
+
+        if (wordsArray.indexOf(guess) === -1) {
+            message.textContent = "Not a valid 5-letter word!";
+            return; 
+        }
+
+        if (guess === randomWord.toUpperCase()) {
+            displayGuessOnGrid(guess);
+            message.textContent = "You win!";
+
+        } else {
+            console.log("Guess submitted:", guess);
+            displayGuessOnGrid(guess);
+            currentAttempt++;
+        }
+
+        input.value = '';
+        
     };
 
     function displayGuessOnGrid(guess) {
@@ -116,6 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < guess.length; i++) {
             if(guess[i] === randomWord[i]){
                 boxes[startIdx + i].style.backgroundColor = 'green';
+            } else {
+                boxes[startIdx + i].style.backgroundColor = 'yellow';
             }
             boxes[startIdx + i].textContent = guess[i];
         }
