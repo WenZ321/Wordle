@@ -126,16 +126,19 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function displayGuessOnGrid(guess) {
-        const startIdx = (currentAttempt + 1) * 5;
+        const startIdx = currentAttempt * 5; // Assuming currentAttempt is zero-based
         const boxes = document.querySelectorAll('.wordle-box');
         for (let i = 0; i < guess.length; i++) {
-            if(guess[i] === randomWord[i]){
+            if (guess[i] === randomWord[i]) {
                 boxes[startIdx + i].style.backgroundColor = 'green';
-            } else {
+            } else if (randomWord.includes(guess[i])) {
                 boxes[startIdx + i].style.backgroundColor = 'yellow';
+            } else {
+                boxes[startIdx + i].style.backgroundColor = 'gray';
             }
             boxes[startIdx + i].textContent = guess[i];
         }
     }
+
 
 });
