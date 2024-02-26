@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
             wordsArray = text.split('\n').map(word => word.trim()).filter(word => word.length > 0);
             console.log("Words loaded from file:", wordsArray);
             for(let i = 0; i < wordsArray.length; i++){
-            wordsArray[i] = wordsArray[i].toUpperCase();
+                wordsArray[i] = wordsArray[i].toUpperCase();
         }
 
         const lettersGuessed = [];
@@ -32,12 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
             grid.appendChild(box);
         }
 
-
-
-        for (let i = 0; i < 5; i++) {
-            const boxes = document.querySelectorAll('.wordle-box');
-            boxes[i].textContent = randomWord[i].toUpperCase();
-        }
+        console.log(randomWord)
 
         const layout = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM←"];
         layout.forEach((row, index) => {
@@ -70,7 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-
+        
+        
         let currentAttempt = 0;
 
         window.submitGuess = () => {
