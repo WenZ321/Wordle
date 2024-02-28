@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const correct = 'rgb(106, 170, 100)';
     const present = 'rgb(201, 180, 88)';
     const absent = 'rgb(120, 124, 126)';
+    
     document.addEventListener('keydown', (e) => {
         if (input.disabled) return;
     
@@ -21,7 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
             window.submitGuess();
         }
     });
+    
     let wordsArray = []
+    
     window.submitGuess = () => {
         
         if (currentAttempt >= 6) {
@@ -67,6 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
             key.disabled = true; 
         });
     }
+    
+    // Reads file
     fetch('words.txt')
         .then(response => response.text())
         .then(text => {
@@ -173,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             for (let i = 0; i < guess.length; i++) {
                 if (randomWord.includes(guess[i])) {
-                    if (dictionary[guess[i]] > 0) {
+                    if (dictionary[guess[i]] > 0 && boxes[startIdx + i].style.backgroundColor != correct) {
                         boxes[startIdx + i].style.backgroundColor = present;
                         boxes[startIdx + i].style.borderColor = present;
                         dictionary[guess[i]] -= 1;
