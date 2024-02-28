@@ -3,7 +3,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const keyboard = document.getElementById('keyboard');
     const input = document.getElementById('guessInput');
     const message = document.getElementById('message');
+    document.addEventListener('keydown', (e) => {
+        if (input.disabled) return;
     
+        const key = e.key.toUpperCase();
+
+        if (key.length === 1 && key >= 'A' && key <= 'Z') {
+            if (input.value.length < 5) {
+                input.value += key;
+            }
+        } else if (key === 'BACKSPACE' || e.key === 'Delete') {
+            input.value = input.value.slice(0, -1);
+        } else if (key === 'ENTER') {
+            window.submitGuess();
+        }
+    });
     let wordsArray = []
     window.submitGuess = () => {
         
@@ -12,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             disableInputAndKeyboard();
             return;
         }
-    
+        
         const guess = input.value.toUpperCase();
         message.textContent = "";
     
