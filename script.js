@@ -5,7 +5,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const message = document.getElementById('message');
     
     let wordsArray = []
+    window.submitGuess = () => {
+        
+        if (currentAttempt >= 6) {
+            message.textContent = "All attempts used. Game over!";
+            disableInputAndKeyboard();
+            return;
+        }
     
+        const guess = input.value.toUpperCase();
+        message.textContent = "";
+    
+        if (guess.length !== 5) {
+            message.textContent = "Please enter a 5-letter word.";
+            return; 
+        }
+    
+        if (wordsArray.indexOf(guess) === -1) {
+            message.textContent = "Not a valid 5-letter word!";
+            return; 
+        }
+    
+        if (guess === randomWord.toUpperCase()) {
+            displayGuessOnGrid(guess);
+            message.textContent = "You win!";
+            disableInputAndKeyboard(); 
+        } else {
+            console.log("Guess submitted:", guess);
+            displayGuessOnGrid(guess);
+            currentAttempt++;
+            if (currentAttempt >= 6) {
+                message.textContent = "Game over! The word was: " + randomWord;
+                disableInputAndKeyboard(); 
+            }
+        }
+    
+        input.value = '';
+    };
+    
+    function disableInputAndKeyboard() {
+        input.disabled = true; 
+        const keys = document.querySelectorAll('.key');
+        keys.forEach(key => {
+            key.disabled = true; 
+        });
+    }
     fetch('words.txt')
         .then(response => response.text())
         .then(text => {
