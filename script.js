@@ -6,6 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let wordsArray = []
     
+    const correct = 'rgb(106, 170, 100)';
+    const present = 'rgb(201, 180, 88)';
+    const absent = 'rgb(120, 124, 126)';
+    
     fetch('words.txt')
         .then(response => response.text())
         .then(text => {
@@ -104,30 +108,36 @@ document.addEventListener('DOMContentLoaded', () => {
             let dictionary = createLetterCountDictionary(randomWord)
             for (let i = 0; i < guess.length; i++) {
                 if (guess[i] === randomWord[i]) {
-                    boxes[startIdx + i].style.backgroundColor = 'green';
-                    getKeyButton(guess[i]).style.backgroundColor = 'green';
+                    boxes[startIdx + i].style.backgroundColor = correct;
+                    boxes[startIdx + i].style.borderColor = correct;
+                    getKeyButton(guess[i]).style.backgroundColor = correct;
                     dictionary[guess[i]] -= 1;
                 }
             }
             for (let i = 0; i < guess.length; i++) {
                 if (randomWord.includes(guess[i])) {
                     if (dictionary[guess[i]] > 0) {
-                        boxes[startIdx + i].style.backgroundColor = 'yellow';
+                        boxes[startIdx + i].style.backgroundColor = present;
+                        boxes[startIdx + i].style.borderColor = present;
                         dictionary[guess[i]] -= 1;
-                        if (getKeyButton(guess[i]).style.backgroundColor != 'green'){
-                            getKeyButton(guess[i]).style.backgroundColor = 'yellow';
+                        if (getKeyButton(guess[i]).style.backgroundColor != correct){
+                            getKeyButton(guess[i]).style.backgroundColor = present;
                         }
-                    } else if (boxes[startIdx + i].style.backgroundColor != 'green'){
-                        boxes[startIdx + i].style.backgroundColor = 'gray';
-                        if (getKeyButton(guess[i]).style.backgroundColor != 'yellow' && getKeyButton(guess[i]).style.backgroundColor != 'green'){
-                            getKeyButton(guess[i]).style.backgroundColor = 'gray';
+                    } else if (boxes[startIdx + i].style.backgroundColor != correct){
+                        console.log(boxes[startIdx + i].style.backgroundColor);
+                        boxes[startIdx + i].style.backgroundColor = absent;
+                        boxes[startIdx + i].style.borderColor = absent;
+                        if (getKeyButton(guess[i]).style.backgroundColor != present && getKeyButton(guess[i]).style.backgroundColor != correct){
+                            getKeyButton(guess[i]).style.backgroundColor = absent;
                         }
                     }
                 } else {
-                    boxes[startIdx + i].style.backgroundColor = 'gray';
-                    getKeyButton(guess[i]).style.backgroundColor = 'gray';
+                    boxes[startIdx + i].style.backgroundColor = absent;
+                    boxes[startIdx + i].style.borderColor = absent;
+                    getKeyButton(guess[i]).style.backgroundColor = absent;
                 }
                 boxes[startIdx + i].textContent = guess[i];
+                boxes[startIdx + i].style.color = 'white';
             }
         }
             })
