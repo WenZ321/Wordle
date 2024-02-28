@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const keyboard = document.getElementById('keyboard');
     const input = document.getElementById('guessInput');
     const message = document.getElementById('message');
+    
+    // Correct = green, present = yellow, absent = gray
     const correct = 'rgb(106, 170, 100)';
     const present = 'rgb(201, 180, 88)';
     const absent = 'rgb(120, 124, 126)';
@@ -82,9 +84,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 wordsArray[i] = wordsArray[i].toUpperCase();
         }
 
+        // Dictionary of guessed letters
         const lettersGuessed = [];
 
-
+        // Generates random word
         function generateRandomWord(){
             const randomIndex = Math.floor(Math.random() * wordsArray.length);
             return wordsArray[randomIndex];
@@ -92,14 +95,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const randomWord = generateRandomWord().toUpperCase();
 
+        // Creates the boxes
         for (let i = 0; i < 30; i++) {
             const box = document.createElement('div');
             box.className = 'wordle-box';
             grid.appendChild(box);
         }
 
+        // Print the random word onto console
         console.log(randomWord)
 
+        // Keyboard layout
         const layout = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM←"];
         layout.forEach((row, index) => {
             const rowDiv = document.createElement('div');
@@ -121,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
             keyboard.appendChild(rowDiv);
         });
 
+        // Handles user input
         function handleKeyPress(key) {
             if (key === 'Enter') {
                 submitGuess();
@@ -132,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         
-        
+        // Amount of tries
         let currentAttempt = 0;
 
         window.submitGuess = () => {
@@ -164,6 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         };
 
+        // Processes guess
         function displayGuessOnGrid(guess) {
             const startIdx = currentAttempt * 5; // Assuming currentAttempt is zero-based
             const boxes = document.querySelectorAll('.wordle-box');
@@ -207,6 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Problem reading the file:', err);
         });
     
+    // Function that creates a dictionary of letters
     function createLetterCountDictionary(word) {
       let letterCount = {};
         
