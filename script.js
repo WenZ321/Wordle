@@ -9,61 +9,63 @@ document.addEventListener('DOMContentLoaded', () => {
     const present = 'rgb(201, 180, 88)';
     const absent = 'rgb(120, 124, 126)';
     
-    document.addEventListener('keydown', (e) => {
-        if (input.disabled) return;
+    let currentAttempt = 0;
     
-        const key = e.key.toUpperCase();
+    
+    function displayGuess(guess){
+        const startIdx = currentAttempt * 5; // Assumes currentAttempt is defined elsewhere
+        const boxes = document.querySelectorAll('.wordle-box');
+        for (let i = 0; i < guess.length; i++){
+            // Correctly setting the text content of each box
+            boxes[startIdx + i].textContent = guess[i];
+        }
+        for (let i = guess.length; i < 5; i++){
+            boxes[startIdx + i].textContent = "";
+        }
+    }
+    
+    function disableKeyboard(event) {
+        event.preventDefault();
+    }
+    
+    
+    let currentInput = '';
+    let keyboardEnabled = true;
 
-        if (key.length === 1 && key >= 'A' && key <= 'Z') {
-            if (input.value.length < 5) {
-                input.value += key;
+    document.addEventListener('keydown', function(event) {
+        // Check if the 'Enter' key is pressed to submit the current guess
+        if (!keyboardEnabled) {
+            return;
+        }
+        
+        if (event.key === 'Enter') {
+            // Call the submitGuess function when the user presses 'Enter'
+            // Ensure the currentInput length is 5 to proceed with submission
+            if(currentInput.length === 5){
+                if (wordsArray.indexOf(currentInput.toUpperCase()) === -1) {
+                    message.textContent = "Not a valid 5-letter word!";
+                } else{
+                    window.submitGuess(currentInput); // Assuming submitGuess handles the guess
+                    currentInput = ''; // Reset currentInput after submission for the next guess
+                }
             }
-        } else if (key === 'BACKSPACE' || e.key === 'Delete') {
-            input.value = input.value.slice(0, -1);
-        } else if (key === 'ENTER') {
-            window.submitGuess();
+        } else {
+            // Handle backspace for deletion or character input for guesses
+            if (event.key === 'Backspace') {
+                // Remove the last character
+                currentInput = currentInput.slice(0, -1);
+            } else if (event.key.length === 1 && event.key.match(/[a-z]/i) && currentInput.length < 5) {
+                // Add new character, ensure it's a letter, and limit the input length
+                currentInput += event.key;
+            }
+
+            // Display the current input, converted to upper case
+            displayGuess(currentInput.toUpperCase());
         }
     });
     
     let wordsArray = []
     
-    window.submitGuess = () => {
-        
-        if (currentAttempt >= 6) {
-            message.textContent = "All attempts used. Game over!";
-            disableInputAndKeyboard();
-            return;
-        }
-        
-        const guess = input.value.toUpperCase();
-        message.textContent = "";
-    
-        if (guess.length !== 5) {
-            message.textContent = "Please enter a 5-letter word.";
-            return; 
-        }
-    
-        if (wordsArray.indexOf(guess) === -1) {
-            message.textContent = "Not a valid 5-letter word!";
-            return; 
-        }
-    
-        if (guess === randomWord.toUpperCase()) {
-            displayGuessOnGrid(guess);
-            message.textContent = "You win!";
-            disableInputAndKeyboard(); 
-        } else {
-            console.log("Guess submitted:", guess);
-            displayGuessOnGrid(guess);
-            currentAttempt++;
-            if (currentAttempt >= 6) {
-                message.textContent = "Game over! The word was: " + randomWord;
-                disableInputAndKeyboard(); 
-            }
-        }
-    
-        input.value = '';
-    };
     
     function disableInputAndKeyboard() {
         input.disabled = true; 
@@ -138,12 +140,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        
-        // Amount of tries
-        let currentAttempt = 0;
 
+        // Submit guess
         window.submitGuess = () => {
-            const guess = input.value.toUpperCase();
+            const guess = currentInput.toUpperCase();
 
             message.textContent = "";
 
@@ -152,27 +152,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 return; 
             }
 
-            if (wordsArray.indexOf(guess) === -1) {
-                message.textContent = "Not a valid 5-letter word!";
-                return; 
-            }
-
             if (guess === randomWord.toUpperCase()) {
-                displayGuessOnGrid(guess);
+                processGuess(guess);
                 message.textContent = "You win!";
-
+                keyboardEnabled = false;
             } else {
                 console.log("Guess submitted:", guess);
-                displayGuessOnGrid(guess);
+                processGuess(guess);
                 currentAttempt++;
+                if (currentAttempt >= 6) {
+                message.textContent = "Game over! The word was: " + randomWord;
+                keyboardEnabled = false; 
             }
-
-            input.value = '';
-
-        };
-
+        }};
+        
+        
         // Processes guess
-        function displayGuessOnGrid(guess) {
+        function processGuess(guess) {
             const startIdx = currentAttempt * 5; // Assuming currentAttempt is zero-based
             const boxes = document.querySelectorAll('.wordle-box');
             let dictionary = createLetterCountDictionary(randomWord)
