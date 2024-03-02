@@ -1,141 +1,223 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // classes need the .
     const grid = document.querySelector('.wordle-grid');
+
+    // div does not
     const keyboard = document.getElementById('keyboard');
-    const input = document.getElementById('guessInput');
     const message = document.getElementById('message');
     
-    let wordsArray = []
-    
+    // Correct = green, present = yellow, absent = gray
+    const correct = 'rgb(106, 170, 100)';
+    const present = 'rgb(201, 180, 88)';
+    const absent = 'rgb(120, 124, 126)';
+    const blank = 'rgb(255, 255, 255)';
+
+
+    let currentGuess = '';
+    let currentBox = 1;
+    let gameOver = false;
+    let currentAttempt = 0;
+    let randomWord = "";
+
+
+    let wordsArray = [];
+
+    //reads the list of words
     fetch('words.txt')
+        // converts words.txt to a string 
         .then(response => response.text())
+
+        // processing the file as a te
         .then(text => {
             // Split the text by new line to create an array
             wordsArray = text.split('\n').map(word => word.trim()).filter(word => word.length > 0);
-            console.log("Words loaded from file:", wordsArray);
+            // console.log("Words loaded from file:", wordsArray);
             for(let i = 0; i < wordsArray.length; i++){
                 wordsArray[i] = wordsArray[i].toUpperCase();
-        }
-
-        const lettersGuessed = [];
-
-        console.log(lettersGuessed)
-
-        function generateRandomWord(){
-            const randomIndex = Math.floor(Math.random() * wordsArray.length);
-            return wordsArray[randomIndex];
-        }
-
-        const randomWord = generateRandomWord().toUpperCase();
-
-        for (let i = 0; i < 30; i++) {
-            const box = document.createElement('div');
-            box.className = 'wordle-box';
-            grid.appendChild(box);
-        }
-
-        console.log(randomWord)
-
-        const layout = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM←"];
-        layout.forEach((row, index) => {
-            const rowDiv = document.createElement('div');
-            rowDiv.className = 'keyboard-row';
-            row.split('').forEach(key => {
-                const btn = document.createElement('button');
-                btn.textContent = key === "←" ? "Delete" : key;
-                btn.className = 'key';
-                btn.addEventListener('click', () => handleKeyPress(key));
-                rowDiv.appendChild(btn);
-            });
-            if (index === 2) { 
-                const enterBtn = document.createElement('button');
-                enterBtn.textContent = 'Enter';
-                enterBtn.className = 'key';
-                enterBtn.addEventListener('click', () => handleKeyPress('Enter'));
-                rowDiv.appendChild(enterBtn);
-            }
-            keyboard.appendChild(rowDiv);
-        });
-
-        function handleKeyPress(key) {
-            if (key === 'Enter') {
-                submitGuess();
-            } else if (key === '←') {
-                input.value = input.value.slice(0, -1);
-            } else if (input.value.length < 5) {
-                input.value += key.toUpperCase();
-            }
-        }
-
-        
-        
-        let currentAttempt = 0;
-
-        window.submitGuess = () => {
-            const guess = input.value.toUpperCase();
-
-            message.textContent = "";
-
-            if (guess.length !== 5) {
-                message.textContent = "Please enter a 5-letter word.";
-                return; 
             }
 
-            if (wordsArray.indexOf(guess) === -1) {
-                message.textContent = "Not a valid 5-letter word!";
-                return; 
-            }
-
-            if (guess === randomWord.toUpperCase()) {
-                displayGuessOnGrid(guess);
-                message.textContent = "You win!";
-
-            } else {
-                console.log("Guess submitted:", guess);
-                displayGuessOnGrid(guess);
-                currentAttempt++;
-            }
-
-            input.value = '';
-
-        };
-
-        function displayGuessOnGrid(guess) {
-            const startIdx = currentAttempt * 5; // Assuming currentAttempt is zero-based
-            const boxes = document.querySelectorAll('.wordle-box');
-            let dictionary = createLetterCountDictionary(randomWord)
-            for (let i = 0; i < guess.length; i++) {
-                if (guess[i] === randomWord[i]) {
-                    boxes[startIdx + i].style.backgroundColor = 'green';
-                    getKeyButton(guess[i]).style.backgroundColor = 'green';
-                    dictionary[guess[i]] -= 1;
-                }
-            }
-            for (let i = 0; i < guess.length; i++) {
-                if (randomWord.includes(guess[i])) {
-                    if (dictionary[guess[i]] > 0) {
-                        boxes[startIdx + i].style.backgroundColor = 'yellow';
-                        dictionary[guess[i]] -= 1;
-                        if (getKeyButton(guess[i]).style.backgroundColor != 'green'){
-                            getKeyButton(guess[i]).style.backgroundColor = 'yellow';
-                        }
-                    } else if (boxes[startIdx + i].style.backgroundColor != 'green'){
-                        boxes[startIdx + i].style.backgroundColor = 'gray';
-                        if (getKeyButton(guess[i]).style.backgroundColor != 'yellow' && getKeyButton(guess[i]).style.backgroundColor != 'green'){
-                            getKeyButton(guess[i]).style.backgroundColor = 'gray';
-                        }
-                    }
-                } else {
-                    boxes[startIdx + i].style.backgroundColor = 'gray';
-                    getKeyButton(guess[i]).style.backgroundColor = 'gray';
-                }
-                boxes[startIdx + i].textContent = guess[i];
-            }
-        }
-            })
+            newGame();
+        })
         .catch(err => {
             console.error('Problem reading the file:', err);
         });
+        
+    // Creates the boxes
+    for (let i = 0; i < 30; i++) {
+        const box = document.createElement('div');
+        box.className = 'wordle-box';
+        grid.appendChild(box);
+    }
+
+    function handleKeyPress(key) {
+        if (currentGuess.length < 5) {
+            if (key === '←' || key === 'Delete') {
+                if(currentGuess.length !== 0){
+                    currentGuess = currentGuess.slice(0, -1);
+                    removeLetterOnGrid();
+                }
+            } else if (key === 'ENTER'){
+                window.submitGuess();
+            } else {
+                currentGuess += key;
+                displayLetterOnGrid(letter);
+            }
+        } 
+    }
+
+    // Keyboard layout
+    const layout = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM←"];
+    layout.forEach((row, index) => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'keyboard-row';
+        row.split('').forEach(key => {
+            const btn = document.createElement('button');
+            btn.textContent = key === "←" ? "Delete" : key;
+            btn.className = 'key';
+            btn.addEventListener('click', () => handleKeyPress(key));
+            rowDiv.appendChild(btn);
+        });
+        if (index === 2) { 
+            const enterBtn = document.createElement('button');
+            enterBtn.textContent = 'Enter';
+            enterBtn.className = 'key';
+            enterBtn.addEventListener('click', () => handleKeyPress('Enter'));
+            rowDiv.appendChild(enterBtn);
+        }
+        keyboard.appendChild(rowDiv);
+    });
+
+    function generateRandomWord(){
+        const randomIndex = Math.floor(Math.random() * wordsArray.length);
+        return wordsArray[randomIndex];
+    } 
+
+    function newGame(){
+        // clears boxes 
+        const boxes = document.querySelectorAll('.wordle-box');
+        boxes.forEach((box) => {
+            box.style.backgroundColor = blank;
+            box.textContent = "";
+        });
+        numberOfAttempts = 0;
+        randomWord = generateRandomWord();
+        currentBox = 0;
+        currentGuess = '';
+        gameOver = false;
+    }
+
+    // Runs when a key is pressed
+    document.addEventListener('keydown', (e) => {
+        if (gameOver) return;
+
+        const key = e.key.toUpperCase();
+
+
+        if (key.length === 1 && key >= 'A' && key <= 'Z') {
+            if (currentGuess.length < 5) {
+                currentGuess += key;
+                displayLetterOnGrid(key);
+            }
+        } else if (key === 'BACKSPACE' || e.key === 'Delete') {
+            if(currentGuess.length !== 0){
+                console.log(currentGuess);
+                currentGuess = currentGuess.slice(0, -1);
+                removeLetterOnGrid();
+            }
+        } else if (key === 'ENTER') {
+            window.submitGuess();
+        }
+    });
     
+
+    function displayLetterOnGrid(letter){
+        const boxes = document.querySelectorAll('.wordle-box');
+        boxes[currentBox].textContent = letter;
+        currentBox++;
+    }
+
+    function removeLetterOnGrid(){
+        const boxes = document.querySelectorAll('.wordle-box');
+        currentBox--;
+        boxes[currentBox].textContent = "";
+    }
+    
+    window.submitGuess = () => {        
+        if (currentGuess.length !== 5) {
+            console.log("Please enter a 5-letter word.");
+            return; 
+        }
+    
+        if (wordsArray.indexOf(currentGuess) === -1) {
+            console.log("Not a valid 5-letter word!");
+            return; 
+        }
+    
+        if (currentGuess === randomWord) {
+            updateColors(currentGuess);
+            console.log("You Win!");
+            disableKeyboard(); 
+            gameOver = true;
+            currentGuess = '';
+        } else {
+            console.log(randomWord);
+            updateColors(currentGuess);
+            console.log("Guess submitted:", currentGuess);
+            currentAttempt++;
+            if (currentAttempt >= 6) {
+                console.log("Game over! The word was: " + randomWord);
+                disableKeyboard(); 
+                gameOver = true;
+            }
+            currentGuess = '';
+        }
+    };
+    
+    function disableKeyboard() {
+        const keys = document.querySelectorAll('.key');
+        keys.forEach(key => {
+            key.disabled = true; 
+        });
+    }
+    
+    // Function to get the button DOM element for a specific letter
+    function getKeyButton(letter) {
+        // Select all buttons with class 'key'
+        const buttons = document.querySelectorAll('.key');
+  
+        // Iterate over the buttons to find the one that matches the letter
+        for (const btn of buttons) {
+          if (btn.textContent === letter) {
+            return btn; // Return the button that matches the letter
+          }
+        }
+  
+        return null; // If no button matches the letter, return null
+      }
+
+    // Processes guess and changes color accordingly
+    function updateColors(guess) {
+        const boxes = document.querySelectorAll('.wordle-box');
+        for (let i = 0; i < guess.length; i++) {
+            if (guess[i] === randomWord[i]) {
+                boxes[currentBox - 5 + i].style.backgroundColor = correct;
+                boxes[currentBox - 5 + i].style.borderColor = correct;
+                getKeyButton(guess[i]).style.backgroundColor = correct;
+            } else if (randomWord.includes(guess[i])){
+                boxes[currentBox - 5 + i].style.backgroundColor = present;
+                boxes[currentBox - 5 + i].style.borderColor = present;
+                if (getKeyButton(guess[i]).style.backgroundColor != correct){
+                    getKeyButton(guess[i]).style.backgroundColor = present;
+                }
+            } else {
+                boxes[currentBox - 5 + i].style.backgroundColor = absent;
+                boxes[currentBox - 5  + i].style.borderColor = absent;
+                getKeyButton(guess[i]).style.backgroundColor = absent;
+            }
+        }
+    }
+    
+    // Function that creates a dictionary of letters
     function createLetterCountDictionary(word) {
       let letterCount = {};
         
@@ -153,21 +235,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       return letterCount;
-    }
-    
-    // Function to get the button DOM element for a specific letter
-    function getKeyButton(letter) {
-      // Select all buttons with class 'key'
-      const buttons = document.querySelectorAll('.key');
-
-      // Iterate over the buttons to find the one that matches the letter
-      for (const btn of buttons) {
-        if (btn.textContent === letter) {
-          return btn; // Return the button that matches the letter
-        }
-      }
-
-      return null; // If no button matches the letter, return null
     }
 
 
