@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const lettersGuessed = [];
 
+        console.log(lettersGuessed)
 
         function generateRandomWord(){
             const randomIndex = Math.floor(Math.random() * wordsArray.length);
