@@ -56,11 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentGuess = currentGuess.slice(0, -1);
                     removeLetterOnGrid();
                 }
-            } else if (key === 'ENTER'){
+            } else if (key === 'Enter'){
                 window.submitGuess();
             } else {
                 currentGuess += key;
-                displayLetterOnGrid(letter);
+                displayLetterOnGrid(key);
             }
         } 
     }
@@ -216,26 +216,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-    
-    // Function that creates a dictionary of letters
-    function createLetterCountDictionary(word) {
-      let letterCount = {};
-        
-      word = word.toUpperCase();
-
-      // Convert the word to an array of characters and iterate over it
-      word.split('').forEach(char => {
-        // If the character is already in the dictionary, increment its count
-        if (letterCount[char]) {
-          letterCount[char]++;
-        } else {
-          // Otherwise, add the character to the dictionary with a count of 1
-          letterCount[char] = 1;
-        }
-      });
-
-      return letterCount;
-    }
-
-
 });
