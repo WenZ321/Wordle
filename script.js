@@ -37,8 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
             for(let i = 0; i < wordsArray.length; i++){
                 wordsArray[i] = wordsArray[i].toUpperCase();
             }
-            
-            
             newGame();
         })
         .catch(err => {
@@ -104,12 +102,18 @@ document.addEventListener('DOMContentLoaded', () => {
         boxes.forEach((box) => {
             box.style.backgroundColor = blank;
             box.textContent = "";
+            box.style.borderColor = absent;
         });
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        for (let i = 0; i < letters.length; i++){
+            getKeyButton(letters[i]).style.backgroundColor = '';
+        }
         numberOfAttempts = 0;
         randomWord = generateRandomWord();
         console.log(randomWord);
         currentBox = 0;
         currentGuess = '';
+        currentAttempt = 0;
         gameOver = false;
         numberOfGames += 1;
         enableKeyboard();
@@ -117,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('playAgainButton').addEventListener('click', () => {
         newGame();
-        playAgainButton.style.display = 'none;'
+        playAgainButton.style.display = 'none';
     });
 
     // Accessing sessionStorage's dictionary
@@ -153,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayLetterOnGrid(letter){
         const boxes = document.querySelectorAll('.wordle-box');
         boxes[currentBox].textContent = letter;
+        boxes[currentBox].style.color = '';
         currentBox++;
     }
 
@@ -162,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         boxes[currentBox].textContent = "";
     }
     
-    window.submitGuess = () => {        
+    window.submitGuess = () => {
         if (currentGuess.length !== 5) {
             console.log("Please enter a 5-letter word.");
             return; 
@@ -215,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function enableKeyboard() {
         const keys = document.querySelectorAll('.key');
         keys.forEach(key => {
-            key.disabled = false; 
+            key.disabled = false;
         });
     }
     
