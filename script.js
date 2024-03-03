@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(text => {
             // Split the text by new line to create an array
             wordsArray = text.split('\n').map(word => word.trim()).filter(word => word.length > 0);
-            // console.log("Words loaded from file:", wordsArray);
+            console.log("Words loaded from file:", wordsArray);
             for(let i = 0; i < wordsArray.length; i++){
                 wordsArray[i] = wordsArray[i].toUpperCase();
             }
@@ -91,11 +91,13 @@ document.addEventListener('DOMContentLoaded', () => {
         keyboard.appendChild(rowDiv);
     });
 
+    // Generates random word
     function generateRandomWord(){
         const randomIndex = Math.floor(Math.random() * wordsArray.length);
         return wordsArray[randomIndex];
     } 
 
+    // Clears and resets everything
     function newGame(){
         // clears boxes 
         const boxes = document.querySelectorAll('.wordle-box');
@@ -105,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         numberOfAttempts = 0;
         randomWord = generateRandomWord();
+        console.log(randomWord);
         currentBox = 0;
         currentGuess = '';
         gameOver = false;
@@ -138,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else if (key === 'BACKSPACE' || e.key === 'Delete') {
             if(currentGuess.length !== 0){
-                console.log(currentGuess);
                 currentGuess = currentGuess.slice(0, -1);
                 removeLetterOnGrid();
             }
@@ -190,7 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             currentGuess = '';
         } else {
-            console.log(randomWord);
             updateColors(currentGuess);
             console.log("Guess submitted:", currentGuess);
             currentAttempt++;
@@ -252,6 +253,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 boxes[currentBox - 5  + i].style.borderColor = absent;
                 getKeyButton(guess[i]).style.backgroundColor = absent;
             }
+        }
+        for (let i = 0; i < guess.length; i++){
+            boxes[currentBox - 5 + i].style.color = 'white';
         }
     }
 });
