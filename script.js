@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // div does not
     const keyboard = document.getElementById('keyboard');
-    const message = document.getElementById('message');
+    const playAgainButton = document.getElementById('playAgainButton');
     
     // Correct = green, present = yellow, absent = gray
     const correct = 'rgb(106, 170, 100)';
@@ -12,7 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const absent = 'rgb(120, 124, 126)';
     const blank = 'rgb(255, 255, 255)';
 
+    let numberOfGames = 0;
 
+    // changeable values during the game
     let currentGuess = '';
     let currentBox = 1;
     let gameOver = false;
@@ -35,7 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
             for(let i = 0; i < wordsArray.length; i++){
                 wordsArray[i] = wordsArray[i].toUpperCase();
             }
-
+            
+            
             newGame();
         })
         .catch(err => {
@@ -49,20 +52,21 @@ document.addEventListener('DOMContentLoaded', () => {
         grid.appendChild(box);
     }
 
+
+    // 
     function handleKeyPress(key) {
-        if (currentGuess.length < 5) {
-            if (key === '←' || key === 'Delete') {
-                if(currentGuess.length !== 0){
-                    currentGuess = currentGuess.slice(0, -1);
-                    removeLetterOnGrid();
-                }
-            } else if (key === 'Enter'){
-                window.submitGuess();
-            } else {
-                currentGuess += key;
-                displayLetterOnGrid(key);
+        if (key === 'Delete') {
+            console.log("a");
+            if (currentGuess.length !== 0) {
+                currentGuess = currentGuess.slice(0, -1);
+                removeLetterOnGrid();
             }
-        } 
+        } else if (key === 'Enter') {
+            window.submitGuess();
+        } else if (currentGuess.length < 5) {
+            currentGuess += key;
+            displayLetterOnGrid(key);
+        }
     }
 
     // Keyboard layout
@@ -104,6 +108,20 @@ document.addEventListener('DOMContentLoaded', () => {
         currentBox = 0;
         currentGuess = '';
         gameOver = false;
+        numberOfGames += 1;
+        enableKeyboard();
+    }
+
+    document.getElementById('playAgainButton').addEventListener('click', () => {
+        newGame();
+        playAgainButton.style.display = 'none;'
+    });
+
+    // Accessing sessionStorage's dictionary
+    function getDictionary(){
+        const dictionaryString = sessionStorage.getItem('dictionary');
+        const dictionary = dictionaryString ? JSON.parse(dictionaryString) : {};
+        return dictionary;
     }
 
     // Runs when a key is pressed
@@ -153,11 +171,23 @@ document.addEventListener('DOMContentLoaded', () => {
             return; 
         }
     
+
+        const dictionary = getDictionary();
+        for(let i = 0; i < currentGuess.length; i++){
+            if(dictionary.hasOwnProperty(currentGuess.substring(i, i+1))){
+                dictionary[currentGuess.substring(i, i+1)] += 1;
+            } else {
+                dictionary[currentGuess.substring(i, i+1)] = 1;
+            }
+        }
+
         if (currentGuess === randomWord) {
             updateColors(currentGuess);
             console.log("You Win!");
             disableKeyboard(); 
             gameOver = true;
+            playAgainButton.style.display = 'inline-block';
+            
             currentGuess = '';
         } else {
             console.log(randomWord);
@@ -168,6 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log("Game over! The word was: " + randomWord);
                 disableKeyboard(); 
                 gameOver = true;
+                playAgainButton.style.display = 'inline-block';
             }
             currentGuess = '';
         }
@@ -177,6 +208,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const keys = document.querySelectorAll('.key');
         keys.forEach(key => {
             key.disabled = true; 
+        });
+    }
+
+    function enableKeyboard() {
+        const keys = document.querySelectorAll('.key');
+        keys.forEach(key => {
+            key.disabled = false; 
         });
     }
     
