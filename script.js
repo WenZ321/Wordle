@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const keyboard = document.getElementById('keyboard');
     const playAgainButton = document.getElementById('playAgainButton');
     
+    
     // Correct = green, present = yellow, absent = gray
     const correct = 'rgb(106, 170, 100)';
     const present = 'rgb(201, 180, 88)';
@@ -131,6 +132,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return dictionary;
     }
 
+    window.onload = function() {
+        sessionStorage.clear();
+    };
+
+
     // Runs when a key is pressed
     document.addEventListener('keydown', (e) => {
         if (gameOver) return;
@@ -181,12 +187,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const dictionary = getDictionary();
         for(let i = 0; i < currentGuess.length; i++){
-            if(dictionary.hasOwnProperty(currentGuess.substring(i, i+1))){
-                dictionary[currentGuess.substring(i, i+1)] += 1;
-            } else {
-                dictionary[currentGuess.substring(i, i+1)] = 1;
-            }
+            const letter = currentGuess[i];
+            dictionary[letter] = (dictionary[letter] || 0) + 1;
         }
+        sessionStorage.setItem('dictionary', JSON.stringify(dictionary));
+        console.log('Updated Dictionary:', dictionary);
 
         if (currentGuess === randomWord) {
             updateColors(currentGuess);
