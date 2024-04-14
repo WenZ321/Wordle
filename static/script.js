@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const guessed_words = {};
 
     //reads the list of words
-    fetch('words.txt')
+    fetch('/static/words.txt')
         // converts words.txt to a string 
         .then(response => response.text())
 
