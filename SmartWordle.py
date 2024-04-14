@@ -1,78 +1,49 @@
-import random
+from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
+import numpy as np
+from sklearn.ensemble import RandomForestRegressor
 
-# Creates bank of words
-file = open("words.txt", "r")
-words = []
-for line in file:
-    words.append(line.strip())
-file.close()
+app = Flask(__name__)
+CORS(app)
+            
+def word_to_numbers(word):
+    word = word.lower()
+    return [ord(char) - ord('a') + 1 for char in word.lower()]
 
-# Generating a random word to pass into GenerateInitalBoxes
-def GenerateWord():
-    return words[random.randint(0, len(words))]
-
-# Generates a random word
-word = GenerateWord()
-
-# Creates a dictionary of the indexes and the character at that index for the word the user is trying to guess
-word_letters = {index: letter for index, letter in enumerate(word)}
-
-# Returns an array of strings specifying the colors assigned to each box in given order
-def process_guess(guess):
-    # Creates another dictionary that is similar to word_letters, but for the guessed word
-    guess_letters = {index: letter for index, letter in enumerate(guess)}
-    placements = []
-    # Assigns colors to the letters
-    for i in range(len(guess_letters)):
-        if guess_letters[i] in word_letters.values():
-            if guess_letters[i] == word_letters[i]:
-                placements.append("green")
-            else:
-                placements.append("yellow")
-        else:
-            placements.append("gray")
-    return placements
-
-def GenerateInitalBoxes(initialWord):
-    word = initialWord.upper()
-    boxTable = ''' \t<div class="wordle-grid">
-            stuff
-        </div>'''
+def choose_new_word(dic, test):
+    # Prepare training data
+    X_train = np.array([word_to_numbers(key) for key in dic.keys()])
+    y_train = np.array(list(dic.values()))
     
-    box = "<div class=\"wordle-box\"> Letter </div>"
-    line = ""
-    # First inital word
-    for x in range(5):
-        line += box.replace("Letter", word[x])
-    line += "\n\t    "
+    # Prepare testing data
+    X_test = np.array([word_to_numbers(word) for word in test])
+
+    # Initialize and train the model
+    model = RandomForestRegressor(n_estimators=100, random_state=42)
+    model.fit(X_train, y_train)
+
+    # Make predictions and evaluate
+    predictions = model.predict(X_test)
     
-    # Other boxes
-    for x in range(4):
-        for y in range(5):
-            line += box.replace("Letter", " ")
-        line += "\n\t    "
-    boxTable = boxTable.replace("stuff", line[: len(line) - 6])
-    return boxTable
+    hard_words = []
 
-boxes = GenerateInitalBoxes("HELLO")
-currentLine = 2
-print(boxes)
+    # Print the predictions with the associated words
+    for word, prediction in zip(test, predictions):
+        hard_words.append([round(prediction, 2), word])
+    hard_words.sort(reverse = True)
+    return hard_words[0][1]
 
+@app.route('/')
+def home():
+    return render_template('SmartWordle.html')
 
-# Guessing mechanic
-def guessing(wordGuessed):
-    word = wordGuessed.upper()
-    box = "<div class=\"wordle-box\"> Letter </div>"
-    line = "\t    "
-    for x in range(5):
-        line += box.replace("Letter", word[x])
-    return line
-'''
-# If  player enters a guess, replace the current line with a new line 
-replaceLine = guessing("Never")
-temp = boxes.split("\n")
-temp[currentLine] = replaceLine
-boxes = "\n".join(temp)
-currentLine += 1
-'''
+@app.route('/choose_new_word', methods=['POST'])
+def choose_new_word_api():
+    content = request.json
+    dic = content.get('dic', {})
+    test_words = content.get('test', [])  # This should match the expected structure in `choose_new_word`
+    result_word = choose_new_word(dic, test_words)
+    return jsonify({'word': result_word})
 
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
