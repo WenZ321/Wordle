@@ -3,6 +3,7 @@
 The wordle that gets harder as you play more
 
 # Running the Game
-1. Navigate to the directory where the file is stored in command prompt
-2. Then type python -m http.server
-3. Open your browser and go to http://localhost:8000/SmartWordle.html
+1. Install Flask in command prompt using "pip install Flask"
+2. Install Flask_Cors in command prompt using "pip install Flask Flask-CORS"
+3. Navigate to the directory where the file is stored in command prompt
+4. Then type "python SmartWordle.py" to run the Flask server
