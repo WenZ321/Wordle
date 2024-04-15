@@ -20,9 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameOver = false;
     let currentAttempt = 0;
     let randomWord = "";
+    let games = 0;
 
 
     let wordsArray = [];
+    let possibleWords = [];
     
     const guessed_words = {};
 
@@ -39,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for(let i = 0; i < wordsArray.length; i++){
                 wordsArray[i] = wordsArray[i].toUpperCase();
             }
+            possibleWords = wordsArray.map(item => item);
             newGame();
         })
         .catch(err => {
@@ -111,7 +114,10 @@ document.addEventListener('DOMContentLoaded', () => {
             getKeyButton(letters[i]).style.backgroundColor = '';
         }
         numberOfAttempts = 0;
-        randomWord = getNewWord(guessed_words, wordsArray);;
+        if (games > 0){
+            randomWord = getNewWord(guessed_words, possibleWords);;
+            randomWord = String(randomWord).toUpperCase();
+        } else randomWord = generateRandomWord();
         console.log(randomWord);
         currentBox = 0;
         currentGuess = '';
@@ -122,6 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('playAgainButton').addEventListener('click', () => {
+        games += 1;
         newGame();
         playAgainButton.style.display = 'none';
     });
@@ -180,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({dic, test}),
+            body: JSON.stringify({ dic: dic, test: test }),
         });
 
         if (!response.ok) {
@@ -188,8 +195,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const data = await response.json();
-        console.log(data.word);  // Use the returned word as needed
+        
+        const word = String(data.word); // Convert the result to a string
+        console.log(word);  // Use the returned word as needed, now guaranteed to be a string
+        return word;
     }
+
     
     window.submitGuess = () => {
         if (currentGuess.length !== 5) {
@@ -215,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateColors(currentGuess);
             console.log("You Win!");
             guessed_words[randomWord] = currentAttempt;
-            wordsArray = wordsArray.filter(item => item !== randomWord);
+            possibleWords = possibleWords.filter(item => item !== randomWord);
             disableKeyboard(); 
             gameOver = true;
             playAgainButton.style.display = 'inline-block';
@@ -269,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateColors(guess) {
             const startIdx = currentAttempt * 5; // Assuming currentAttempt is zero-based
             const boxes = document.querySelectorAll('.wordle-box');
-            let dictionary = createLetterCountDictionary(randomWord)
+            let dictionary = createLetterCountDictionary(randomWord);
             for (let i = 0; i < guess.length; i++) {
                 if (guess[i] === randomWord[i]) {
                     boxes[startIdx + i].style.backgroundColor = correct;
@@ -305,21 +316,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     
     function createLetterCountDictionary(word) {
-      let letterCount = {};
-        
-      word = word.toUpperCase();
+        let letterCount = {};
 
-      // Convert the word to an array of characters and iterate over it
-      word.split('').forEach(char => {
-        // If the character is already in the dictionary, increment its count
-        if (letterCount[char]) {
-          letterCount[char]++;
+        if (typeof word === 'string') {
+            word = word.toUpperCase();
+
+            // Convert the word to an array of characters and iterate over it
+            word.split('').forEach(char => {
+                // If the character is already in the dictionary, increment its count
+                if (letterCount[char]) {
+                    letterCount[char]++;
+                } else {
+                    // Otherwise, add the character to the dictionary with a count of 1
+                    letterCount[char] = 1;
+                }
+            });
         } else {
-          // Otherwise, add the character to the dictionary with a count of 1
-          letterCount[char] = 1;
+            console.error('Expected a string for word, received:', word);
+            console.error(typeof word);
         }
-      });
 
-      return letterCount;
+        return letterCount;
     }
+
 });
