@@ -25,11 +25,6 @@ def choose_new_word(dic, test_words):
     
     # Ensure that X_train is a 2D array with shape (n_samples, n_features)
     # This assumes that word_to_numbers() has already ensured a 2D shape per word
-    if X_train.ndim == 1:
-        X_train = X_train.reshape(-1, 1)
-    
-    if X_test.ndim == 1:
-        X_test = X_test.reshape(-1, 1)
 
     model.fit(X_train, y_train)
 

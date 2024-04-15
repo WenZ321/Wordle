@@ -115,8 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         numberOfAttempts = 0;
         if (games > 0){
-            randomWord = getNewWord(guessed_words, possibleWords);;
-            randomWord = String(randomWord).toUpperCase();
+            updateRandomWord();
         } else randomWord = generateRandomWord();
         console.log(randomWord);
         currentBox = 0;
@@ -199,6 +198,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const word = String(data.word); // Convert the result to a string
         console.log(word);  // Use the returned word as needed, now guaranteed to be a string
         return word;
+    }
+    
+    async function updateRandomWord() {
+        try {
+            const newWord = await getNewWord(guessed_words, possibleWords);
+            randomWord = newWord.toUpperCase(); // Now newWord should be a string and can be converted to upper case
+        } catch (error) {
+            console.error("Failed to get new word:", error);
+        }
     }
 
     
