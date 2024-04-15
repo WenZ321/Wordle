@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
             getKeyButton(letters[i]).style.backgroundColor = '';
         }
         numberOfAttempts = 0;
-        if (games > 0){
+        if (games > 1){
             updateRandomWord();
         } else randomWord = generateRandomWord();
         console.log(randomWord);
