@@ -21,12 +21,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentAttempt = 0;
     let randomWord = "";
     let games = 0;
+    let letter_frequency = generateLetterFreqDic();
+    let guessed_letters = getDictionary();
 
 
     let wordsArray = [];
     let possibleWords = [];
     
     const guessed_words = {};
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
     //reads the list of words
     fetch('/static/words.txt')
@@ -109,11 +112,17 @@ document.addEventListener('DOMContentLoaded', () => {
             box.textContent = "";
             box.style.borderColor = absent;
         });
-        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         for (let i = 0; i < letters.length; i++){
             getKeyButton(letters[i]).style.backgroundColor = '';
         }
+        // Updates letter frequency dictionary
+        for (const letter in guessed_letters){
+            if (guessed_letters[letter] === true){
+                letter_frequency[letter] += 1;
+            }
+        }
         numberOfAttempts = 0;
+        console.log(letter_frequency);
         if (games > 1){
             updateRandomWord();
         } else randomWord = generateRandomWord();
@@ -123,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentAttempt = 0;
         gameOver = false;
         numberOfGames += 1;
+        guessed_letters = getDictionary();
         enableKeyboard();
     }
 
@@ -132,11 +142,14 @@ document.addEventListener('DOMContentLoaded', () => {
         playAgainButton.style.display = 'none';
     });
 
-    // Accessing sessionStorage's dictionary
+    // Creating dictionary of true and false for tracking guessed letters
     function getDictionary(){
-        const dictionaryString = sessionStorage.getItem('dictionary');
-        const dictionary = dictionaryString ? JSON.parse(dictionaryString) : {};
-        return dictionary;
+        const dic = {};
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        for (const letter of letters) {
+            dic[letter] = false;
+        }
+        return dic;
     }
 
     window.onload = function() {
@@ -180,13 +193,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Chooses new word
-    async function getNewWord(dic, test) {
+    async function getNewWord(dic, test, freq) {
         const response = await fetch('/choose_new_word', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ dic: dic, test: test }),
+            body: JSON.stringify({ dic: dic, test: test, frequency: freq}),
         });
 
         if (!response.ok) {
@@ -200,9 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return word;
     }
     
+    // Calls the function that generates the new word
     async function updateRandomWord() {
         try {
-            const newWord = await getNewWord(guessed_words, possibleWords);
+            const newWord = await getNewWord(guessed_words, possibleWords, letter_frequency);
             randomWord = newWord.toUpperCase(); // Now newWord should be a string and can be converted to upper case
         } catch (error) {
             console.error("Failed to get new word:", error);
@@ -221,21 +235,18 @@ document.addEventListener('DOMContentLoaded', () => {
             return; 
         }
     
-
-        const dictionary = getDictionary();
         for(let i = 0; i < currentGuess.length; i++){
             const letter = currentGuess[i];
-            dictionary[letter] = (dictionary[letter] || 0) + 1;
+            guessed_letters[letter] = true;
         }
-        sessionStorage.setItem('dictionary', JSON.stringify(dictionary));
-        console.log('Updated Dictionary:', dictionary);
+        console.log('Updated Dictionary:', guessed_letters);
 
         if (currentGuess === randomWord) {
             updateColors(currentGuess);
             console.log("You Win!");
             guessed_words[randomWord] = currentAttempt;
             possibleWords = possibleWords.filter(item => item !== randomWord);
-            disableKeyboard(); 
+            disableKeyboard();
             gameOver = true;
             playAgainButton.style.display = 'inline-block';
             
@@ -345,6 +356,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         return letterCount;
+    }
+    
+    function generateLetterFreqDic() {
+        const dic = {};
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        for (const letter of letters) {
+            dic[letter] = 0;
+        }
+        return dic;
     }
 
 });
