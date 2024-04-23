@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const present = 'rgb(201, 180, 88)';
     const absent = 'rgb(120, 124, 126)';
     const blank = 'rgb(255, 255, 255)';
+    const border = 'rgb(211,214,218)';
+
+    let numberOfGames = 0;
 
     // changeable values during the game
     let currentGuess = '';
@@ -82,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = document.createElement('button');
             btn.textContent = key === "←" ? "Delete" : key;
             btn.className = 'key';
+            btn.style.backgroundColor = border;
             btn.addEventListener('click', () => handleKeyPress(key));
             rowDiv.appendChild(btn);
         });
@@ -108,10 +112,10 @@ document.addEventListener('DOMContentLoaded', () => {
         boxes.forEach((box) => {
             box.style.backgroundColor = blank;
             box.textContent = "";
-            box.style.borderColor = absent;
+            box.style.borderColor = border;
         });
         for (let i = 0; i < letters.length; i++){
-            getKeyButton(letters[i]).style.backgroundColor = '';
+            getKeyButton(letters[i]).style.backgroundColor = border;
         }
         // Updates letter frequency dictionary
         for (const letter in guessed_letters){
@@ -181,6 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const boxes = document.querySelectorAll('.wordle-box');
         boxes[currentBox].textContent = letter;
         boxes[currentBox].style.color = '';
+        boxes[currentBox].style.borderColor = absent;
         currentBox++;
     }
 
@@ -188,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const boxes = document.querySelectorAll('.wordle-box');
         currentBox--;
         boxes[currentBox].textContent = "";
+        boxes[currentBox].style.borderColor = border;
     }
     
     // Chooses new word
