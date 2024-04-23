@@ -12,8 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const absent = 'rgb(120, 124, 126)';
     const blank = 'rgb(255, 255, 255)';
 
-    let numberOfGames = 0;
-
     // changeable values during the game
     let currentGuess = '';
     let currentBox = 1;

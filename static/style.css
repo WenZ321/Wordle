@@ -1,28 +1,29 @@
 body, html {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   flex-direction: column;
-  height: 88vh;
-  margin-top: 12vh;
+  height: 100vh;
+  margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
+  position: relative;
 }
 
 h1 {
   text-align: center; 
-  margin-top: 0; 
-  padding: 1.5% 0; 
+  padding: 20px 0; 
   height: 10vh;
   background-color: #ffffff; 
   color: #ff0000; 
   font-family: Arial, sans-serif; 
   width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
 }
 
+.description {
+  text-align: center;
+  margin-top: -15%;
+}
 
 .guess {
   display: flex;
@@ -33,11 +34,16 @@ h1 {
   border: 2px solid #333;
   font-size: 24px;
 }
+
+#playAgainButton {
+  border-radius: 10px;
+}
+
 #keyboard {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 20px;
+    margin-top: 60px;
 }
 
 .keyboard-row {
@@ -63,9 +69,8 @@ h1 {
   display: grid;
     grid-template-columns: repeat(5, 60px); 
     grid-template-rows: repeat(6, 60px); 
-    gap: 1%; 
     justify-content: center; 
-    margin-top: -12vh; 
+    margin: 20px 0;
     padding: 1%;
 }
 .wordle-box {
@@ -78,4 +83,5 @@ h1 {
   font-size: 100%;
   font-weight: bold;
   color: #000; /* Black text, if needed */
+  border-radius: 10px;
 }
