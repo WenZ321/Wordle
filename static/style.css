@@ -15,7 +15,7 @@ h1 {
   padding: 1.5% 0; 
   height: 10vh;
   background-color: #ffffff; 
-  color: #ff0000; 
+  color: #003253; 
   font-family: Arial, sans-serif; 
   width: 100%;
   position: absolute;
@@ -23,6 +23,11 @@ h1 {
   left: 0;
 }
 
+.text{
+  display: absolute;
+  font-size: 20px;
+  left: 200px;
+}
 
 .guess {
   display: flex;
@@ -43,12 +48,12 @@ h1 {
 .keyboard-row {
     display: flex;
     justify-content: center;
-    margin: 1% 0;
+    margin: 2% 0;
 }
 .key {
     width: 100%;
     height: 100%;
-    margin: 1%;
+    margin: 1.5%;
     border: none;
     background-color: #d3d6da;
     cursor: pointer;
@@ -62,12 +67,13 @@ h1 {
     grid-template-rows: repeat(6, 60px); 
     gap: 1%; 
     justify-content: center; 
-    margin-top: -12vh; 
+    margin-top: -32vh; 
     padding: 1%;
 }
 .wordle-box {
   width: 80%;
   height: 80%;
+  border-radius: 14px;
   border: 2px solid #d3d6da; /* Gray border */
   display: flex;
   justify-content: center;
