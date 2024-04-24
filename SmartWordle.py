@@ -20,7 +20,7 @@ def letter_frequency(word, letter_freqs):
 def choose_new_word(dic, test_words, letter_freqs):
     # Prepare training data with updated features
     X_train = np.array([word_to_numbers(key)[0] for key in dic.keys()])
-    y_train = np.array([value - letter_frequency(key, letter_freqs) for key, value in dic.items()])
+    y_train = np.array(list(dic.values()))
     
     # Prepare testing data
     X_test = np.array([word_to_numbers(word)[0] for word in test_words])  # This ensures it's a 2D array
@@ -37,6 +37,11 @@ def choose_new_word(dic, test_words, letter_freqs):
     # Associate the predictions with the corresponding words
     for word, prediction in zip(test_words, predictions):
         hard_words.append([round(prediction, 2), word])
+        
+    # Penalizes the difficulty of the words that uses more commonly guessed letters
+    for word in hard_words:
+        word[0] = word[0] - letter_frequency(word[1], letter_freqs)
+        
     hard_words.sort(reverse=True)
     return hard_words[0][1]  # Return the word with the highest prediction value
 
