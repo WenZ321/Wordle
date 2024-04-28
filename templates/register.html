@@ -1,0 +1,89 @@
+<!-- templates/register.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <style>
+        /* Style for the flash messages container */
+        #flash-messages {
+            position: fixed;      
+            top: 20px;            
+            left: 50%;          
+            transform: translateX(-50%); 
+            z-index: 1000;     
+            width: auto;     
+            text-align: center; 
+        }
+
+        /* Style for individual flash messages */
+        .flash-message {
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f8d7da; /* Example for error messages */
+            color: #721c24; /* Example for error messages */
+            /* Add more styles as needed */
+        }
+
+        .flash-success {
+            background-color: #d4edda; /* Example for success messages */
+            color: #155724; /* Example for success messages */
+        }
+
+        .flash-message {
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Hiding the message */
+        .flash-message-hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        const messages = document.querySelectorAll('.flash-message');
+        // Set a timeout to hide each message after 2 seconds
+        messages.forEach((message) => {
+            setTimeout(() => {
+                message.classList.add('flash-message-hide');
+            }, 2000);
+        });
+        
+        const form = document.querySelector('.signup-form');
+        form.addEventListener('submit', (event) => {
+            const username = document.querySelector('input[name="username"]').value;
+            const password = document.querySelector('input[name="password"]').value;
+
+            // Simple client-side validation example
+            if (!username || !password) {
+                alert('Please fill out all fields.');
+                event.preventDefault();  // Prevent form submission if validation fails
+            }
+            // More robust validation can be added here
+        });
+    });
+    </script>
+    <h1>Register</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-message flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('register') }}" method="post">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Register</button>
+    </form>
+</body>
+</html>

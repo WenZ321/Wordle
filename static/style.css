@@ -3,7 +3,7 @@ body, html {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  height: 88vh;
+  height: 100vh;
   margin-top: 12vh;
   padding: 0;
   font-family: Arial, sans-serif;
@@ -75,4 +75,114 @@ h1 {
   font-size: 100%;
   font-weight: bold;
   color: #000; /* Black text, if needed */
+}
+
+/* Container for the form elements */
+.login-form {
+    position: fixed; /* Fixed positioning makes the container stay in place during scrolling */
+    top: 0; /* Align top edge with the top of the viewport */
+    right: 0; /* Align right edge with the right of the viewport */
+    padding: 10px;
+    display: flex;
+    flex-direction: column; /* Stack form elements vertically */
+    align-items: flex-start; /* Align form items to the start (left) */
+    width: 200px; /* Set a fixed width for the form */
+}
+
+/* Container for buttons */
+.button-container {
+    display: flex; /* Enables flexbox layout */
+    width: 100%; /* Ensures container takes full width of the form */
+    justify-content: space-between; /* Spaces the buttons evenly */
+    gap: 10px; /* Adds space between buttons */
+}
+
+/* General style for buttons */
+.login-form button {
+    flex: 1; /* Allows buttons to grow and fill the container equally */
+    padding: 8px 16px;
+    border-radius: 20px; /* Makes buttons rounded */
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 0; /* Removes bottom margin if previously set */
+}
+
+/* Specific style for the login button */
+.login-btn {
+    background-color: #007bff; /* Bootstrap blue */
+}
+
+.login-btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Specific style for the signup button */
+.signup-btn {
+    background-color: #4CAF50; /* Green background for the sign-up button */
+}
+
+.signup-btn:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Style for the flash messages container */
+#flash-messages {
+    position: fixed;      
+    top: 20px;            
+    left: 50%;          
+    transform: translateX(-50%); 
+    z-index: 1000;     
+    width: auto;     
+    text-align: center; 
+}
+
+/* Style for individual flash messages */
+.flash-message {
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background-color: #f8d7da; /* Example for error messages */
+    color: #721c24; /* Example for error messages */
+    /* Add more styles as needed */
+}
+
+.flash-success {
+    background-color: #d4edda; /* Example for success messages */
+    color: #155724; /* Example for success messages */
+}
+
+.flash-message {
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Hiding the message */
+.flash-message-hide {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Add to style.css */
+.welcome-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-bottom-left-radius: 8px;
+}
+
+.signout-btn {
+    background-color: #dc3545; /* Bootstrap red */
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    margin-left: 10px;
+    border-radius: 4px;
+}
+
+.signout-btn:hover {
+    background-color: #bd2130;
 }

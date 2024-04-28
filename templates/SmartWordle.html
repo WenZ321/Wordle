@@ -7,10 +7,38 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-message flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
     <h1>Smart Wordle</h1>
     <div class="wordle-grid"></div>
     <button id="playAgainButton" style="display: none;">Play Again</button>
     <div id="keyboard"></div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <!-- Place this at the top of the body in SmartWordle.html -->
+    {% if session['username'] %}
+        <div class="welcome-container">
+            Welcome, {{ session['username'] }}
+            <a href="{{ url_for('logout') }}" class="signout-btn">Sign Out</a>
+        </div>
+    {% else %}
+        <!-- The existing login container -->
+        <div class="login-container">
+            <form class="login-form" action="/login" method="POST">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <div class="button-container">
+                    <button type="submit" class="login-btn">Login</button>
+                    <a href="{{ url_for('register') }}" class="signup-btn-link"><button type="button" class="signup-btn">Sign Up</button></a>
+                </div>
+            </form>
+        </div>
+    {% endif %}
 </body>
 </html>

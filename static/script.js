@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    
+    const messages = document.querySelectorAll('.flash-message');
+    // Set a timeout to hide each message after 2 seconds
+    messages.forEach((message) => {
+        setTimeout(() => {
+            message.classList.add('flash-message-hide');
+        }, 2000);
+    });
+    
     // classes need the .
     const grid = document.querySelector('.wordle-grid');
 
@@ -160,11 +169,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Runs when a key is pressed
     document.addEventListener('keydown', (e) => {
-        if (gameOver) return;
+        // Check if the game is over or if the focus is on an input field
+        if (gameOver || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT') {
+            return; // Ignore the event if the game is over or the focus is on input, textarea, or select
+        }
 
         const key = e.key.toUpperCase();
-
-
         if (key.length === 1 && key >= 'A' && key <= 'Z') {
             if (currentGuess.length < 5) {
                 currentGuess += key;
