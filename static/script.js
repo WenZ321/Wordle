@@ -1,5 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     
+    console.log('Letter Frequencies:', letterFrequency);
+    console.log('User Game Data:', userData);
+    console.log('Number of games:', num_games);
+    
     const messages = document.querySelectorAll('.flash-message');
     // Set a timeout to hide each message after 2 seconds
     messages.forEach((message) => {
@@ -22,24 +26,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const blank = 'rgb(255, 255, 255)';
     const border = 'rgb(211,214,218)';
 
-    let numberOfGames = 0;
-
     // changeable values during the game
     let currentGuess = '';
     let currentBox = 1;
     let gameOver = false;
     let currentAttempt = 0;
     let randomWord = "";
-    let games = 0;
-    let letter_frequency = generateLetterFreqDic();
+    let games = num_games;
+    let letter_frequency = letterFrequency;
     let guessed_letters = getDictionary();
 
 
     let wordsArray = [];
     let possibleWords = [];
     
-    const guessed_words = {};
+    const guessed_words = userData;
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    
+    possibleWords = possibleWords.filter(word => !(word in guessed_words));
 
     //reads the list of words
     fetch('/static/words.txt')
@@ -136,13 +140,14 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log(letter_frequency);
         if (games > 1){
             updateRandomWord();
+        } else if (games === 1) {
+            updateRandomWord();
         } else randomWord = generateRandomWord();
         console.log(randomWord);
         currentBox = 0;
         currentGuess = '';
         currentAttempt = 0;
         gameOver = false;
-        numberOfGames += 1;
         guessed_letters = getDictionary();
         enableKeyboard();
     }
@@ -258,6 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentGuess === randomWord) {
             updateColors(currentGuess);
             console.log("You Win!");
+            currentAttempt++;
             guessed_words[randomWord] = currentAttempt;
             possibleWords = possibleWords.filter(item => item !== randomWord);
             disableKeyboard();
@@ -271,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentAttempt++;
             if (currentAttempt >= 6) {
                 console.log("Game over! The word was: " + randomWord);
-                guessed_words[randomWord] = currentAttempt;
+                guessed_words[randomWord] = 10;
                 disableKeyboard(); 
                 gameOver = true;
                 playAgainButton.style.display = 'inline-block';

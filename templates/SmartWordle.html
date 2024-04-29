@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<<<<<<< HEAD
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +7,27 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <script>
+    {% if letter_freq and user_data and num_games %}
+        var letterFrequency = {{ letter_freq | tojson | safe }};
+        var userData = {{ user_data | tojson | safe }};
+        var num_games = {{ num_games }};
+        console.log('Letter Frequencies:', letterFrequency);
+        console.log('User Game Data:', userData);
+        console.log('Number of Games:', num_games);
+    {% else %}
+        const dic = {};
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        for (const letter of letters) {
+            dic[letter] = 0;
+        }
+        var letterFrequency = dic;
+        var userData = {};
+        var num_games = 0;
+        console.log('No data available. Defaulting to empty structures.');
+    {% endif %}
+    </script>
+    <div id="app"></div>
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         <div id="flash-messages">
@@ -42,19 +62,4 @@
         </div>
     {% endif %}
 </body>
-=======
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Wordle Game</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    </head>
-    <body>
-        <h1>Smart Wordle</h1>
-        <div class="wordle-grid"></div>
-        <button id="playAgainButton" style="display: none;">Play Again</button>
-        <div id="keyboard"></div>
-        <script src="{{ url_for('static', filename='script.js') }}"></script>
-    </body>
->>>>>>> b8a716ef035b0e51ab3909d08a0155c8e301b398
 </html>
