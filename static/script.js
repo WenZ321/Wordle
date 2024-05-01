@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentAttempt = 0;
     let randomWord = "";
     let games = num_games;
+    let wins = 0;
     let letter_frequency = letterFrequency;
     let guessed_letters = getDictionary();
 
@@ -118,6 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return wordsArray[randomIndex];
     } 
 
+    function updateStats(games, wins) {
+        document.getElementById('games-played').textContent = games;
+        document.getElementById('wins').textContent = wins;
+        document.getElementById('win-percentage').textContent = Math.round((wins / games) * 100) + '%';
+    }
+
+    updateStats(games, wins);
+
     // Clears and resets everything
     function newGame(){
         // clears boxes 
@@ -147,9 +156,11 @@ document.addEventListener('DOMContentLoaded', () => {
         currentBox = 0;
         currentGuess = '';
         currentAttempt = 0;
+        games++;
         gameOver = false;
         guessed_letters = getDictionary();
         enableKeyboard();
+        updateStats(games, wins)
     }
 
     document.getElementById('playAgainButton').addEventListener('click', () => {
@@ -157,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
         newGame();
         playAgainButton.style.display = 'none';
     });
+
 
     // Creating dictionary of true and false for tracking guessed letters
     function getDictionary(){
@@ -268,6 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
             possibleWords = possibleWords.filter(item => item !== randomWord);
             disableKeyboard();
             gameOver = true;
+            wins++;
             playAgainButton.style.display = 'inline-block';
             
             currentGuess = '';
