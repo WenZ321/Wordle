@@ -84,6 +84,21 @@ p {
     height: 3vh;
     border-radius: 14px;
 }
+/* Add this to your CSS file */
+@keyframes win-animation {
+    0%, 100% {
+        transform: scale(1);
+        background-color: rgb(106, 170, 100); /* Original green color */
+    }
+    50% {
+        transform: scale(1.2);
+        background-color: gold;
+    }
+}
+
+.wordle-box.win {
+    animation: win-animation 1s ease-in-out forwards;
+}
 
 .wordle-grid {
     display: grid;

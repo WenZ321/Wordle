@@ -32,8 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameOver = false;
     let currentAttempt = 0;
     let randomWord = "";
-    let games = num_games;
-    let wins = 0;
+    let games = parseInt(localStorage.getItem('games') || num_games);
+    let wins = parseInt(localStorage.getItem('wins') || 0);
     let letter_frequency = letterFrequency;
     let guessed_letters = getDictionary();
 
@@ -156,11 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
         currentBox = 0;
         currentGuess = '';
         currentAttempt = 0;
-        games++;
         gameOver = false;
         guessed_letters = getDictionary();
         enableKeyboard();
-        updateStats(games, wins)
+        updateStats(games, wins);
     }
 
     document.getElementById('playAgainButton').addEventListener('click', () => {
@@ -312,6 +311,54 @@ document.addEventListener('DOMContentLoaded', () => {
             key.disabled = false;
         });
     }
+    function updateColors(guess) {
+        const startIdx = currentAttempt * 5; // Assuming currentAttempt is zero-based
+        const boxes = document.querySelectorAll('.wordle-box');
+        let dictionary = createLetterCountDictionary(randomWord);
+    
+        for (let i = 0; i < guess.length; i++) {
+            if (guess[i] === randomWord[i]) {
+                boxes[startIdx + i].style.backgroundColor = correct;
+                boxes[startIdx + i].style.borderColor = correct;
+                getKeyButton(guess[i]).style.backgroundColor = correct;
+                dictionary[guess[i]] -= 1;
+            }
+        }
+        for (let i = 0; i < guess.length; i++) {
+            if (randomWord.includes(guess[i])) {
+                if (dictionary[guess[i]] > 0 && boxes[startIdx + i].style.backgroundColor != correct) {
+                    boxes[startIdx + i].style.backgroundColor = present;
+                    boxes[startIdx + i].style.borderColor = present;
+                    dictionary[guess[i]] -= 1;
+                    if (getKeyButton(guess[i]).style.backgroundColor != correct){
+                        getKeyButton(guess[i]).style.backgroundColor = present;
+                    }
+                } else if (boxes[startIdx + i].style.backgroundColor != correct){
+                    boxes[startIdx + i].style.backgroundColor = absent;
+                    boxes[startIdx + i].style.borderColor = absent;
+                    if (getKeyButton(guess[i]).style.backgroundColor != present && getKeyButton(guess[i]).style.backgroundColor != correct){
+                        getKeyButton(guess[i]).style.backgroundColor = absent;
+                    }
+                }
+            } else {
+                boxes[startIdx + i].style.backgroundColor = absent;
+                boxes[startIdx + i].style.borderColor = absent;
+                getKeyButton(guess[i]).style.backgroundColor = absent;
+            }
+            boxes[startIdx + i].textContent = guess[i];
+            boxes[startIdx + i].style.color = 'white';
+        }
+    
+        // Check if win
+        if (guess === randomWord) {
+            for (let i = startIdx; i < startIdx + 5; i++) {
+                boxes[i].classList.add('win');
+            }
+            console.log("You Win!");
+            // additional game end logic here
+        }
+    }
+    
     
     // Function to get the button DOM element for a specific letter
     function getKeyButton(letter) {
