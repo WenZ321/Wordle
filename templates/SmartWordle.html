@@ -27,8 +27,10 @@
                 <td id="win-percentage">0</td>
             </tr>
         </table>
+        <h4>Guess Distribution</h4>
+        <div id="guess-stats"></div>
     </div>
-    <div class = "main-content">
+    <div class="main-content">
         <script>
         {% if letter_freq and user_data and num_games %}
             var letterFrequency = {{ letter_freq | tojson | safe }};
@@ -60,9 +62,9 @@
         {% endif %}
         {% endwith %}
         <h1>Smart Wordle</h1>
-        <p> A Wordle that gets harder and harder! </p>
+        <p>A Wordle that gets harder and harder!</p>
         <div class="wordle-grid"></div>
-        <button id="playAgainButton"  style="display: none;">Play Again</button>
+        <button id="playAgainButton" style="display: none;">Play Again</button>
         <div id="keyboard"></div>
         <script src="{{ url_for('static', filename='script.js') }}"></script>
         

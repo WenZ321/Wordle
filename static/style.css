@@ -277,3 +277,34 @@ p {
 .stats-table th {
     background-color: #eee; /* Light background for header */
 }
+
+/* for stats for games for each guess # */
+
+#guess-stats {
+    margin-top: 20px;
+}
+
+.guess-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.guess-label {
+    width: 50px; /* Adjust width as needed */
+    text-align: left;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.guess-bar-fill {
+    height: 20px;
+    background-color: #4CAF50; /* Green fill color */
+    border-radius: 5px;
+    text-align: right;
+    padding-right: 5px;
+    box-sizing: border-box;
+    color: white;
+    line-height: 20px; /* Match the height to vertically center text */
+    font-size: 12px;
+}

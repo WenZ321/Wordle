@@ -132,6 +132,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateStats(games, wins);
+    
+    function renderGuessStats() {
+        const totalGames = num_games;
+        const guessStats = Array(7).fill(0); // 6 for guesses 1-6 and 1 for losses
+
+        for (const [word, guessCount] of Object.entries(userData)) {
+            if (guessCount <= 6) {
+                guessStats[guessCount - 1]++;
+            } else {
+                guessStats[6]++; // Count losses
+            }
+        }
+
+        const statsContainer = document.getElementById('guess-stats');
+        statsContainer.innerHTML = '';
+
+        guessStats.forEach((count, index) => {
+            const percentage = totalGames ? (count / totalGames * 100).toFixed(2) : 0;
+            const barContainer = document.createElement('div');
+            barContainer.classList.add('guess-bar');
+
+            const guessNumber = index < 6 ? `${index + 1}` : "Lost"; // Label for guesses 1-6 and Lost
+            const barColor = index < 6 ? '#4CAF50' : '#FF0000'; // Green for guesses, Red for losses
+
+            const barFill = document.createElement('div');
+            barFill.classList.add('guess-bar-fill');
+            barFill.style.width = percentage + '%';
+            barFill.style.backgroundColor = barColor;
+            barFill.textContent = count > 0 ? `${count}` : ''; // Show count inside the bar
+
+            const label = document.createElement('span');
+            label.classList.add('guess-label');
+            label.textContent = guessNumber;
+
+            barContainer.appendChild(label);
+            barContainer.appendChild(barFill);
+            statsContainer.appendChild(barContainer);
+        });
+    }
+    
+    renderGuessStats();
+
             
 
     // Clears and resets everything
