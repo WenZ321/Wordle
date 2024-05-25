@@ -32,11 +32,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameOver = false;
     let currentAttempt = 0;
     let randomWord = "";
-    let games = parseInt(localStorage.getItem('games') || num_games);
-    let wins = parseInt(localStorage.getItem('wins') || 0);
+    let games = num_games
+    let wins = 0;
     let letter_frequency = letterFrequency;
     let guessed_letters = getDictionary();
-
+    
+    // Update the wins
+    for (const [word, guessCount] of Object.entries(userData)) {
+        if (guessCount <= 6) {
+            wins++;  // Increment wins if the number of guesses is 6 or fewer
+        }
+    }
 
     let wordsArray = [];
     let possibleWords = [];
@@ -126,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateStats(games, wins);
+            
 
     // Clears and resets everything
     function newGame(){
