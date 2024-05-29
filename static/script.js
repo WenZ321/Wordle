@@ -96,25 +96,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Keyboard layout
-    const layout = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM←"];
+    const layout = ["QWERTYUIOP", "ASDFGHJKL", "EZXCVBNM←"];
     layout.forEach((row, index) => {
         const rowDiv = document.createElement('div');
         rowDiv.className = 'keyboard-row';
         row.split('').forEach(key => {
-            const btn = document.createElement('button');
-            btn.textContent = key === "←" ? "Delete" : key;
-            btn.className = 'key';
-            btn.style.backgroundColor = border;
-            btn.addEventListener('click', () => handleKeyPress(key));
-            rowDiv.appendChild(btn);
+            if (key === "E" && index === 2) {
+                const enterBtn = document.createElement('button');
+                enterBtn.textContent = 'Enter';
+                enterBtn.className = 'key enter-key';
+                enterBtn.style.backgroundColor = border;
+                enterBtn.addEventListener('click', () => handleKeyPress('Enter'));
+                rowDiv.appendChild(enterBtn);
+            } else if (key === "←") {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = '&#x232B;'; // Unicode for Delete (Backspace) symbol
+                deleteBtn.className = 'key delete-key';
+                deleteBtn.style.backgroundColor = border;
+                deleteBtn.addEventListener('click', () => handleKeyPress('Delete'));
+                rowDiv.appendChild(deleteBtn);
+            } else {
+                const btn = document.createElement('button');
+                btn.textContent = key;
+                btn.className = 'key';
+                btn.style.backgroundColor = border;
+                btn.addEventListener('click', () => handleKeyPress(key));
+                rowDiv.appendChild(btn);
+            }
         });
-        if (index === 2) { 
-            const enterBtn = document.createElement('button');
-            enterBtn.textContent = 'Enter';
-            enterBtn.className = 'key';
-            enterBtn.addEventListener('click', () => handleKeyPress('Enter'));
-            rowDiv.appendChild(enterBtn);
-        }
         keyboard.appendChild(rowDiv);
     });
 

@@ -73,6 +73,19 @@ p {
     cursor: pointer;
     BORDER: 2px solid #686e75;
 }
+
+.enter-key {
+    width: 10vh; /* Adjust width to fit your design */
+}
+
+.delete-key {
+    font-size: 2.5vh; /* Adjust size of the "X" symbol */
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 #guessInput {
   margin-right: 10px;
 }
