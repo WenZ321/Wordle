@@ -185,13 +185,21 @@ def choose_new_word_api():
         result = cur.fetchone()
         if result:
             user_id = result[0]
-            cur.execute('''INSERT INTO games (user_id, word, guess) VALUES (?, ?, ?)''', (user_id, most_recent_word, most_recent_guess))
-            cur.execute("UPDATE users SET num_games = ? WHERE username = ?", (len(dic), username))
-            serialized_data = json.dumps(letter_frequency)
-            cur.execute("UPDATE users SET user_data = ? WHERE username = ?", (serialized_data, username))
+            
+            # Check if the word already exists for the user
+            cur.execute("SELECT * FROM games WHERE user_id = ? AND word = ?", (user_id, most_recent_word))
+            existing_word = cur.fetchone()
+            
+            if existing_word is None:
+                # Insert the new word and guess
+                cur.execute('''INSERT INTO games (user_id, word, guess) VALUES (?, ?, ?)''', (user_id, most_recent_word, most_recent_guess))
+                cur.execute("UPDATE users SET num_games = ? WHERE username = ?", (len(dic), username))
+                serialized_data = json.dumps(letter_frequency)
+                cur.execute("UPDATE users SET user_data = ? WHERE username = ?", (serialized_data, username))
             
     result_word = choose_new_word(dic, test_words, letter_frequency)
     return jsonify({'word': result_word})
+
 
 def word_to_numbers(word):
     word = word.lower()

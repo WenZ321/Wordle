@@ -102,9 +102,9 @@ p {
 
 .wordle-grid {
     display: grid;
-    grid-template-columns: repeat(5, 80px); 
-    grid-template-rows: repeat(6, 80px); 
-    height: 400px;
+    grid-template-columns: repeat(5, 60px); 
+    grid-template-rows: repeat(6, 60px); 
+    height: 250px;
     width: 350px;
     gap: 1%; 
     justify-content: center; 
@@ -279,7 +279,6 @@ p {
 }
 
 /* for stats for games for each guess # */
-
 #guess-stats {
     margin-top: 20px;
 }
@@ -291,9 +290,9 @@ p {
 }
 
 .guess-label {
-    width: 50px; /* Adjust width as needed */
+    width: 30px; /* Adjust width as needed */
     text-align: left;
-    margin-right: 10px;
+    margin-right: 17px;
     font-weight: bold;
 }
 
@@ -307,4 +306,5 @@ p {
     color: white;
     line-height: 20px; /* Match the height to vertically center text */
     font-size: 12px;
+    transition: width 0.5s ease-in-out; /* Smooth transition for width changes */
 }
