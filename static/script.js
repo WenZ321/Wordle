@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     
     console.log('Letter Frequencies:', letterFrequency);
     console.log('User Game Data:', userData);
@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let wins = 0;
     let letter_frequency = letterFrequency;
     let guessed_letters = getDictionary();
+    let start_game = false;
     
     // Update the wins
     for (const [word, guessCount] of Object.entries(userData)) {
@@ -51,11 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
     //reads the list of words
-    fetch('/static/words.txt')
+    await fetch('/static/words.txt')
         // converts words.txt to a string 
         .then(response => response.text())
 
-        // processing the file as a te
+        // processing the file as a text
         .then(text => {
             // Split the text by new line to create an array
             wordsArray = text.split('\n').map(word => word.trim()).filter(word => word.length > 0);
@@ -65,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             possibleWords = wordsArray.map(item => item);
             possibleWords = possibleWords.filter(word => !(word in guessed_words));
-            newGame();
         })
         .catch(err => {
             console.error('Problem reading the file:', err);
@@ -82,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 
     function handleKeyPress(key) {
         if (key === 'Delete') {
-            console.log("a");
             if (currentGuess.length !== 0) {
                 currentGuess = currentGuess.slice(0, -1);
                 removeLetterOnGrid();
@@ -205,11 +204,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         numberOfAttempts = 0;
         console.log(letter_frequency);
-        if (games > 1){
-            updateRandomWord();
-        } else if (games === 1) {
-            updateRandomWord();
-        } else randomWord = generateRandomWord();
+        if (start_game === true){
+            if (games > 1){
+                updateRandomWord();
+            } else if (games === 1) {
+                updateRandomWord();
+            } else randomWord = generateRandomWord();
+        }
         console.log(randomWord);
         currentBox = 0;
         currentGuess = '';
@@ -311,6 +312,43 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Failed to get new word:", error);
         }
     }
+    
+    async function update_game(guess, game_over){
+        const response = await fetch('/update_game',{
+            method: 'POST',
+            headers: {'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ guess: guess, game_over: game_over}),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+    }
+    
+    // Define the async function get_game_data
+    async function get_game_data() {
+        try {
+            const response = await fetch('/get_unsuccessful_guesses', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            randomWord = String(data.randomWord).toUpperCase();
+            console.log(randomWord)
+            return data.guesses // Ensure the function returns the guesses array
+        } catch (error) {
+            console.error('Failed to fetch game data:', error);
+            return [];
+        }
+    }
 
     
     window.submitGuess = () => {
@@ -338,9 +376,13 @@ document.addEventListener('DOMContentLoaded', () => {
             possibleWords = possibleWords.filter(item => item !== randomWord);
             disableKeyboard();
             gameOver = true;
+            if (start_game){
+                update_game(currentGuess, gameOver);
+            }
             wins++;
-            playAgainButton.style.display = 'inline-block';
-            
+            setTimeout(() => {
+                playAgainButton.style.display = 'inline-block';
+            }, 1000);
             currentGuess = '';
         } else {
             updateColors(currentGuess);
@@ -354,9 +396,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 gameOver = true;
                 playAgainButton.style.display = 'inline-block';
             }
+            if (start_game){
+                update_game(currentGuess, gameOver);
+            }
             currentGuess = '';
         }
     };
+    
+    let game_guesses = await get_game_data();
+    
+    console.log(game_guesses);
+
+    function submitPreviousGuesses(guesses) {
+        for (let guess of guesses) {
+            currentGuess = guess;
+            window.submitGuess();
+        }
+        currentBox = currentAttempt * 5;
+    }
     
     function disableKeyboard() {
         const keys = document.querySelectorAll('.key');
@@ -375,6 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const startIdx = currentAttempt * 5; // Assuming currentAttempt is zero-based
         const boxes = document.querySelectorAll('.wordle-box');
         let dictionary = createLetterCountDictionary(randomWord);
+        console.log(randomWord);
     
         for (let i = 0; i < guess.length; i++) {
             if (guess[i] === randomWord[i]) {
@@ -414,8 +472,15 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = startIdx; i < startIdx + 5; i++) {
                 boxes[i].classList.add('win');
             }
-            console.log("You Win!");
-            // additional game end logic here
+
+            // Set a timeout to remove the 'win' class and change color to 'present'
+            setTimeout(() => {
+                for (let i = startIdx; i < startIdx + 5; i++) {
+                    boxes[i].classList.remove('win');
+                    boxes[i].style.backgroundColor = correct;
+                    boxes[i].style.borderColor = correct;
+                }
+            }, 2000); // Delay in milliseconds (1000ms = 1 second)
         }
     }
     
@@ -434,45 +499,6 @@ document.addEventListener('DOMContentLoaded', () => {
   
         return null; // If no button matches the letter, return null
       }
-
-    // Processes guess and changes color accordingly
-    function updateColors(guess) {
-            const startIdx = currentAttempt * 5; // Assuming currentAttempt is zero-based
-            const boxes = document.querySelectorAll('.wordle-box');
-            let dictionary = createLetterCountDictionary(randomWord);
-            for (let i = 0; i < guess.length; i++) {
-                if (guess[i] === randomWord[i]) {
-                    boxes[startIdx + i].style.backgroundColor = correct;
-                    boxes[startIdx + i].style.borderColor = correct;
-                    getKeyButton(guess[i]).style.backgroundColor = correct;
-                    dictionary[guess[i]] -= 1;
-                }
-            }
-            for (let i = 0; i < guess.length; i++) {
-                if (randomWord.includes(guess[i])) {
-                    if (dictionary[guess[i]] > 0 && boxes[startIdx + i].style.backgroundColor != correct) {
-                        boxes[startIdx + i].style.backgroundColor = present;
-                        boxes[startIdx + i].style.borderColor = present;
-                        dictionary[guess[i]] -= 1;
-                        if (getKeyButton(guess[i]).style.backgroundColor != correct){
-                            getKeyButton(guess[i]).style.backgroundColor = present;
-                        }
-                    } else if (boxes[startIdx + i].style.backgroundColor != correct){
-                        boxes[startIdx + i].style.backgroundColor = absent;
-                        boxes[startIdx + i].style.borderColor = absent;
-                        if (getKeyButton(guess[i]).style.backgroundColor != present && getKeyButton(guess[i]).style.backgroundColor != correct){
-                            getKeyButton(guess[i]).style.backgroundColor = absent;
-                        }
-                    }
-                } else {
-                    boxes[startIdx + i].style.backgroundColor = absent;
-                    boxes[startIdx + i].style.borderColor = absent;
-                    getKeyButton(guess[i]).style.backgroundColor = absent;
-                }
-                boxes[startIdx + i].textContent = guess[i];
-                boxes[startIdx + i].style.color = 'white';
-            }
-        }
     
     function createLetterCountDictionary(word) {
         let letterCount = {};
@@ -506,5 +532,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return dic;
     }
+    
+    newGame();
+    
+    submitPreviousGuesses(game_guesses);
+    
+    start_game = true;
 
 });

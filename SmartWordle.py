@@ -39,7 +39,8 @@ def register():
                     username TEXT NOT NULL UNIQUE,
                     password_hash TEXT NOT NULL,
                     user_data TEXT, 
-                    num_games INT
+                    num_games INT,
+                    last_word TEXT
                 );
             ''')
 
@@ -62,8 +63,8 @@ def login():
         username = request.form['username']
         password = request.form['password']  # You should validate and check this against the database
         
-        # Function to check if username and password math:
-        if validate_login(username, password):  # Replace with actual validation function
+        # Function to check if username and password match:
+        if validate_login(username, password):
             session['username'] = username
             flash('Login successful!', 'success')
             user_data = fetch_user_data(username)
@@ -97,7 +98,96 @@ def validate_login(acc_username, password):
             return False
     else:
         flash('Invalid username!', 'error')
-        return False
+        return False  
+
+@app.route('/get_unsuccessful_guesses', methods=['POST'])
+def get_unsuccessful_guesses():
+    if 'username' in session:
+        username = session['username']
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        database_path = os.path.join(basedir, 'db', 'users.db')
+
+        with sqlite3.connect(database_path) as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT id, last_word FROM users WHERE username = ?", (username,))
+            result = cur.fetchone()
+            if result:
+                user_id = result[0]
+                guesses, word = get_unsuccessful_game_data(user_id)
+                return jsonify({'guesses': guesses, 'randomWord': word})
+
+def get_unsuccessful_game_data(user_id):
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    database_path = os.path.join(basedir, 'db', 'users.db')
+    
+    with sqlite3.connect(database_path) as conn:
+        cur = conn.cursor()
+        
+        # Retrieve all guesses for that user_id up until the last true
+        cur.execute('''
+            SELECT guess, game_over FROM game_data
+            WHERE user_id = ?
+            ORDER BY ROWID DESC;
+        ''', (user_id,))
+        all_entries = cur.fetchall()
+
+        guesses = []
+        word = get_last_word(user_id)
+        for i in range(len(all_entries)):
+            guess, game_over = all_entries[i][0], all_entries[i][1]
+            if game_over and i != 0:
+                break
+            else:
+                guesses.append(guess)
+                
+        last_game = all_entries[0][1]
+
+        if word[0][0] != guesses[0] and last_game == 0 or (word[0][0] == guesses[0] and last_game == 1):
+            return list(reversed(guesses)), word
+        else:
+            return [], word
+    
+def get_last_word(user_id):
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    database_path = os.path.join(basedir, 'db', 'users.db')
+    
+    with sqlite3.connect(database_path) as conn:
+        cur = conn.cursor()
+        cur.execute('''
+            SELECT last_word FROM users
+            WHERE id = ?;
+        ''', (user_id,))
+        word = cur.fetchall()
+        return word
+    
+# Saves player's data within games so they can resume once they relogin   
+@app.route('/update_game', methods=['POST'])
+def update_game():
+    content = request.json
+    guess = content.get('guess', "")
+    game_over = content.get('game_over', bool)
+    if 'username' in session:    
+        username = session['username']
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        database_path = os.path.join(basedir, 'db', 'users.db')
+        with sqlite3.connect(database_path) as conn:
+            cur = conn.cursor()
+            # Creates the game_data table if it doesn't exist
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS game_data (
+                    user_id INTEGER,
+                    guess INT NOT NULL,
+                    game_over BOOLEAN,
+                    FOREIGN KEY (user_id) REFERENCES users(id)
+                );
+            ''')
+            # Gets user ID
+            cur.execute("SELECT id FROM users WHERE username = ?", (username,))
+            result = cur.fetchone()
+            if result:
+                user_id = result[0]
+                cur.execute('''INSERT INTO game_data (user_id, guess, game_over) VALUES (?, ?, ?)''', (user_id, guess, game_over))
+    return('', 204)
 
 @app.route('/')
 def home():
@@ -167,37 +257,49 @@ def fetch_user_data(username):
 
 @app.route('/choose_new_word', methods=['POST'])
 def choose_new_word_api():
-    username = session['username']
     content = request.json
     dic = content.get('dic', {})
     test_words = content.get('test', [])  # This should match the expected structure in `choose_new_word`
     letter_frequency = content.get('frequency', {})
     
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    database_path = os.path.join(basedir, 'db', 'users.db')
-    
-    # Get the most recent word and guess
-    most_recent_word, most_recent_guess = list(dic.items())[-1]
-    
-    with sqlite3.connect(database_path) as conn:
-        cur = conn.cursor()
-        cur.execute("SELECT id FROM users WHERE username = ?", (username,))
-        result = cur.fetchone()
-        if result:
-            user_id = result[0]
-            
-            # Check if the word already exists for the user
-            cur.execute("SELECT * FROM games WHERE user_id = ? AND word = ?", (user_id, most_recent_word))
-            existing_word = cur.fetchone()
-            
-            if existing_word is None:
-                # Insert the new word and guess
-                cur.execute('''INSERT INTO games (user_id, word, guess) VALUES (?, ?, ?)''', (user_id, most_recent_word, most_recent_guess))
-                cur.execute("UPDATE users SET num_games = ? WHERE username = ?", (len(dic), username))
-                serialized_data = json.dumps(letter_frequency)
-                cur.execute("UPDATE users SET user_data = ? WHERE username = ?", (serialized_data, username))
+    if 'username' in session:    
+        username = session['username']
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        database_path = os.path.join(basedir, 'db', 'users.db')
+
+        # Get the most recent word and guess
+        most_recent_word, most_recent_guess = list(dic.items())[-1]
+
+        with sqlite3.connect(database_path) as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT id FROM users WHERE username = ?", (username,))
+            result = cur.fetchone()
+            if result:
+                user_id = result[0]
+
+                # Check if the word already exists for the user
+                cur.execute("SELECT * FROM games WHERE user_id = ? AND word = ?", (user_id, most_recent_word))
+                existing_word = cur.fetchone()
+
+                if existing_word is None:
+                    # Insert the new word and guess
+                    cur.execute('''INSERT INTO games (user_id, word, guess) VALUES (?, ?, ?)''', (user_id, most_recent_word, most_recent_guess))
+                    cur.execute("UPDATE users SET num_games = ? WHERE username = ?", (len(dic), username))
+                    serialized_data = json.dumps(letter_frequency)
+                    cur.execute("UPDATE users SET user_data = ? WHERE username = ?", (serialized_data, username))
             
     result_word = choose_new_word(dic, test_words, letter_frequency)
+    if 'username' in session:    
+        username = session['username']
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        database_path = os.path.join(basedir, 'db', 'users.db')
+        with sqlite3.connect(database_path) as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT id FROM users WHERE username = ?", (username,))
+            result = cur.fetchone()
+            if result:
+                user_id = result[0]
+                cur.execute("UPDATE users SET last_word = ? WHERE username = ?", (result_word, username))
     return jsonify({'word': result_word})
 
 
