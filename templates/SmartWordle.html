@@ -73,6 +73,13 @@
                 Welcome, {{ session['username'] }}
                 <a href="{{ url_for('logout') }}" class="signout-btn">Sign Out</a>
             </div>
+            <div class="toggle-container">
+                <label class="switch">
+                    <input type="checkbox" id="toggleHardMode">
+                    <span class="slider round"></span>
+                </label>
+                <span id="toggleLabel">Hard Mode: OFF</span>
+            </div>
         {% else %}
             <!-- The existing login container -->
             <div class="login-container">

@@ -50,6 +50,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const guessed_words = userData;
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    
+    let hardMode = false;
+    let mustHave = ['', '', '', '', ''];
+    let mustContain = [];
+
+    // Function to toggle hard mode
+    function toggleHardMode() {
+        hardMode = !hardMode;
+        const label = document.getElementById('toggleLabel');
+        label.textContent = hardMode ? 'Hard Mode: ON' : 'Hard Mode: OFF';
+        console.log('Hard Mode:', hardMode);
+    }
+
+    // Add event listener to the toggle hard mode switch
+    const toggleHardModeSwitch = document.getElementById('toggleHardMode');
+    toggleHardModeSwitch.addEventListener('change', toggleHardMode);
 
     //reads the list of words
     await fetch('/static/words.txt')
@@ -216,6 +232,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         currentGuess = '';
         currentAttempt = 0;
         gameOver = false;
+        mustContain = [];
+        mustHave = ['', '', '', '', ''];
         guessed_letters = getDictionary();
         enableKeyboard();
         updateStats(games, wins);
@@ -361,6 +379,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log("Not a valid 5-letter word!");
             return; 
         }
+        
+        if (hardMode === true){
+            for (let i = 0; i < 5; i++){
+                if (mustHave[i] != currentGuess[i] && mustHave[i] != ''){
+                    let end = "st";
+                    if (i === 1){
+                        end = "nd";
+                    } else if (i === 2){
+                        end = "rd";
+                    } else if (i === 3 || i === 4){
+                        end = "th";
+                    }
+                    console.log(i + 1 + end + " letter must be " + mustHave[i]);
+                    return;
+                }
+            }
+            for (let i = 0; i < mustContain.length; i++){
+                if (!currentGuess.includes(mustContain[i])){
+                    console.log("Guess must contain " + mustContain[i]);
+                    return;
+                }
+            }
+        }
     
         for(let i = 0; i < currentGuess.length; i++){
             const letter = currentGuess[i];
@@ -440,6 +481,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 boxes[startIdx + i].style.borderColor = correct;
                 getKeyButton(guess[i]).style.backgroundColor = correct;
                 dictionary[guess[i]] -= 1;
+                mustHave[i] = guess[i];
+                console.log(mustHave);
             }
         }
         for (let i = 0; i < guess.length; i++) {
@@ -448,6 +491,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     boxes[startIdx + i].style.backgroundColor = present;
                     boxes[startIdx + i].style.borderColor = present;
                     dictionary[guess[i]] -= 1;
+                    if (!mustContain.includes(guess[i])){
+                        mustContain.push(guess[i]);
+                        console.log(mustContain);
+                    }
                     if (getKeyButton(guess[i]).style.backgroundColor != correct){
                         getKeyButton(guess[i]).style.backgroundColor = present;
                     }
