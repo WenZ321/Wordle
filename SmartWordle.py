@@ -112,9 +112,12 @@ def get_unsuccessful_guesses():
             cur.execute("SELECT id, last_word FROM users WHERE username = ?", (username,))
             result = cur.fetchone()
             if result:
-                user_id = result[0]
-                guesses, word = get_unsuccessful_game_data(user_id)
-                return jsonify({'guesses': guesses, 'randomWord': word})
+                if result[1] == None:
+                    return jsonify({'guesses': [], 'randomWord': ''})
+                else:
+                    user_id = result[0]
+                    guesses, word = get_unsuccessful_game_data(user_id)
+                    return jsonify({'guesses': guesses, 'randomWord': word})
 
 def get_unsuccessful_game_data(user_id):
     basedir = os.path.abspath(os.path.dirname(__file__))
@@ -289,6 +292,17 @@ def choose_new_word_api():
                     cur.execute("UPDATE users SET user_data = ? WHERE username = ?", (serialized_data, username))
             
     result_word = choose_new_word(dic, test_words, letter_frequency)
+    set_last_word(result_word)
+    return jsonify({'word': result_word})
+
+@app.route('/set_last', methods=['POST'])
+def set_last():
+    content = request.json
+    word = content.get('word', '')
+    set_last_word(word)
+    return('', 204)
+    
+def set_last_word(word):
     if 'username' in session:    
         username = session['username']
         basedir = os.path.abspath(os.path.dirname(__file__))
@@ -299,9 +313,7 @@ def choose_new_word_api():
             result = cur.fetchone()
             if result:
                 user_id = result[0]
-                cur.execute("UPDATE users SET last_word = ? WHERE username = ?", (result_word, username))
-    return jsonify({'word': result_word})
-
+                cur.execute("UPDATE users SET last_word = ? WHERE username = ?", (word, username))
 
 def word_to_numbers(word):
     word = word.lower()

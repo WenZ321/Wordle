@@ -344,6 +344,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     
+    async function setRandom(word) {
+        const response = await fetch('/set_last',{
+            method: 'POST',
+            headers: {'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ word: word}),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+    }
+    
     // Define the async function get_game_data
     async function get_game_data() {
         try {
@@ -360,6 +373,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const data = await response.json();
             randomWord = String(data.randomWord).toUpperCase();
+            if (randomWord === ''){
+                randomWord = generateRandomWord();
+                setRandom(randomWord);
+            }
             console.log(randomWord)
             return data.guesses // Ensure the function returns the guesses array
         } catch (error) {
