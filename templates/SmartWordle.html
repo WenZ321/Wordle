@@ -43,6 +43,7 @@
             console.log('Letter Frequencies:', letterFrequency);
             console.log('User Game Data:', userData);
             console.log('Number of Games:', num_games);
+            const session = true;
         {% else %}
             const dic = {};
             const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -53,6 +54,7 @@
             var userData = {};
             var num_games = 0;
             console.log('No data available. Defaulting to empty structures.');
+            const session = false;
         {% endif %}
         </script>
         <div id="app"></div>
@@ -100,6 +102,13 @@
                         <a href="{{ url_for('register') }}" class="signup-btn-link"><button type="button" class="signup-btn">Sign Up</button></a>
                     </div>
                 </form>
+            </div>
+            <div class="toggle-container">
+                <label class="switch">
+                    <input type="checkbox" id="toggleHardMode">
+                    <span class="slider round"></span>
+                </label>
+                <span id="toggleLabel">Hard Mode: OFF</span>
             </div>
         {% endif %}
     </div>

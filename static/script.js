@@ -69,7 +69,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Add event listener to the toggle hard mode switch
     const toggleHardModeSwitch = document.getElementById('toggleHardMode');
-    toggleHardModeSwitch.addEventListener('change', toggleHardMode);
+    
+    const toggleContainer = document.querySelector('.toggle-container');
+    console.log(toggleContainer);
+    if (!session){
+        toggleContainer.classList.add('logged-out-position');
+    }
+    
+    toggleHardModeSwitch.addEventListener('change', () => {
+        toggleHardMode();
+    });
     
     // For sidebar
     toggleSidebarButton.addEventListener('click', () => {
@@ -338,6 +347,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         front.textContent = letter;
         // Update back face with state-specific styles
         back.textContent = letter;
+        front.style.color = 'white';
+        back.style.color = 'white';
         if (state === 'correct') {
             back.style.backgroundColor = correct;
             back.style.borderColor = correct;
@@ -494,7 +505,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             wins++;
             setTimeout(() => {
                 playAgainButton.style.display = 'inline-block';
-            }, 1000);
+            }, 3000);
             currentGuess = '';
         } else {
             updateColors(currentGuess);
@@ -551,7 +562,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (guess[i] === randomWord[i]) {
                 guessState[i] = 'correct';
                 getKeyButton(guess[i]).style.backgroundColor = correct;
-                getKeyButton(guess[i]).style.borderColor = correct;
                 dictionary[guess[i]] -= 1;
                 mustHave[i] = guess[i];
                 console.log(mustHave);
@@ -590,7 +600,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Check if win
         if (guess === randomWord) {
             setTimeout(() => {
-                console.log("true");
                 for (let i = startIdx; i < startIdx + 5; i++) {
                     boxes[i].classList.add('win');
                 }
@@ -599,8 +608,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 setTimeout(() => {
                     for (let i = startIdx; i < startIdx + 5; i++) {
                         boxes[i].classList.remove('win');
-                        boxes[i].style.backgroundColor = correct;
-                        boxes[i].style.borderColor = correct;
                     }
                 }, 2000); // Delay in milliseconds
             }, guess.length * 500); // Ensure this runs after all boxes have flipped

@@ -118,6 +118,8 @@ def get_unsuccessful_guesses():
                     user_id = result[0]
                     guesses, word = get_unsuccessful_game_data(user_id)
                     return jsonify({'guesses': guesses, 'randomWord': word})
+    else:
+        return jsonify({'guesses': [], 'randomWord': ''})
 
 def get_unsuccessful_game_data(user_id):
     basedir = os.path.abspath(os.path.dirname(__file__))
