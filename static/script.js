@@ -25,6 +25,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const absent = 'rgb(120, 124, 126)';
     const blank = 'rgb(255, 255, 255)';
     const border = 'rgb(211,214,218)';
+    
+    // Sidebar
+    const toggleSidebarButton = document.getElementById('toggleSidebarButton');
+    const statsSidebar = document.getElementById('statsSidebar');
 
     // changeable values during the game
     let currentGuess = '';
@@ -66,6 +70,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Add event listener to the toggle hard mode switch
     const toggleHardModeSwitch = document.getElementById('toggleHardMode');
     toggleHardModeSwitch.addEventListener('change', toggleHardMode);
+    
+    // For sidebar
+    toggleSidebarButton.addEventListener('click', () => {
+        statsSidebar.classList.toggle('open');
+    });
 
     //reads the list of words
     await fetch('/static/words.txt')
@@ -88,9 +97,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         
     // Creates the boxes
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 29; i++) {
         const box = document.createElement('div');
         box.className = 'wordle-box';
+
+        const front = document.createElement('div');
+        front.className = 'front';
+
+        const back = document.createElement('div');
+        back.className = 'back';
+
+        box.appendChild(front);
+        box.appendChild(back);
         grid.appendChild(box);
     }
 
@@ -205,9 +223,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         // clears boxes 
         const boxes = document.querySelectorAll('.wordle-box');
         boxes.forEach((box) => {
-            box.style.backgroundColor = blank;
-            box.textContent = "";
-            box.style.borderColor = border;
+            const front = box.querySelector('.front');
+            front.style.backgroundColor = blank;
+            front.textContent = "";
+            front.style.borderColor = border;
+            const back = box.querySelector('.back');
+            back.style.backgroundColor = blank;
+            back.textContent = "";
+            back.style.borderColor = border;
         });
         for (let i = 0; i < letters.length; i++){
             getKeyButton(letters[i]).style.backgroundColor = border;
@@ -287,17 +310,47 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function displayLetterOnGrid(letter){
         const boxes = document.querySelectorAll('.wordle-box');
-        boxes[currentBox].textContent = letter;
-        boxes[currentBox].style.color = '';
-        boxes[currentBox].style.borderColor = absent;
+        const front = boxes[currentBox].querySelector('.front');
+        front.textContent = letter;
+        front.style.color = '';
+        front.style.borderColor = absent;
         currentBox++;
     }
 
     function removeLetterOnGrid(){
         const boxes = document.querySelectorAll('.wordle-box');
         currentBox--;
-        boxes[currentBox].textContent = "";
-        boxes[currentBox].style.borderColor = border;
+        const front = boxes[currentBox].querySelector('.front');
+        front.textContent = "";
+        front.style.borderColor = border;
+    }
+    
+    // Function to flip the boxes
+    function flipBox(box, letter, state) {
+        const front = box.querySelector('.front');
+        const back = box.querySelector('.back');
+
+        if (!front || !back) {
+            console.error("Missing .front or .back element in .wordle-box", box);
+            return;
+        }
+        // Update front face
+        front.textContent = letter;
+        // Update back face with state-specific styles
+        back.textContent = letter;
+        if (state === 'correct') {
+            back.style.backgroundColor = correct;
+            back.style.borderColor = correct;
+        } else if (state === 'present') {
+            back.style.backgroundColor = present;
+            back.style.borderColor = present;
+        } else if (state === 'absent') {
+            back.style.backgroundColor = absent;
+            back.style.borderColor = absent;
+        }
+
+        // Add the flipped class to trigger the animation
+        box.classList.add('flipped');
     }
     
     // Chooses new word
@@ -424,6 +477,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const letter = currentGuess[i];
             guessed_letters[letter] = true;
         }
+        
         console.log('Updated Dictionary:', guessed_letters);
 
         if (currentGuess === randomWord) {
@@ -490,13 +544,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const startIdx = currentAttempt * 5; // Assuming currentAttempt is zero-based
         const boxes = document.querySelectorAll('.wordle-box');
         let dictionary = createLetterCountDictionary(randomWord);
+        let guessState = ['absent', 'absent', 'absent', 'absent', 'absent']
         console.log(randomWord);
     
         for (let i = 0; i < guess.length; i++) {
             if (guess[i] === randomWord[i]) {
-                boxes[startIdx + i].style.backgroundColor = correct;
-                boxes[startIdx + i].style.borderColor = correct;
+                guessState[i] = 'correct';
                 getKeyButton(guess[i]).style.backgroundColor = correct;
+                getKeyButton(guess[i]).style.borderColor = correct;
                 dictionary[guess[i]] -= 1;
                 mustHave[i] = guess[i];
                 console.log(mustHave);
@@ -504,9 +559,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         for (let i = 0; i < guess.length; i++) {
             if (randomWord.includes(guess[i])) {
-                if (dictionary[guess[i]] > 0 && boxes[startIdx + i].style.backgroundColor != correct) {
-                    boxes[startIdx + i].style.backgroundColor = present;
-                    boxes[startIdx + i].style.borderColor = present;
+                if (dictionary[guess[i]] > 0 && guessState[i] != 'correct') {
+                    guessState[i] = 'present';
                     dictionary[guess[i]] -= 1;
                     if (!mustContain.includes(guess[i])){
                         mustContain.push(guess[i]);
@@ -515,36 +569,41 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (getKeyButton(guess[i]).style.backgroundColor != correct){
                         getKeyButton(guess[i]).style.backgroundColor = present;
                     }
-                } else if (boxes[startIdx + i].style.backgroundColor != correct){
-                    boxes[startIdx + i].style.backgroundColor = absent;
-                    boxes[startIdx + i].style.borderColor = absent;
+                } else if (guessState[i] != 'correct'){
+                    guessState[i] = 'absent';
                     if (getKeyButton(guess[i]).style.backgroundColor != present && getKeyButton(guess[i]).style.backgroundColor != correct){
                         getKeyButton(guess[i]).style.backgroundColor = absent;
                     }
                 }
             } else {
-                boxes[startIdx + i].style.backgroundColor = absent;
-                boxes[startIdx + i].style.borderColor = absent;
+                guessState[i] = 'absent';
                 getKeyButton(guess[i]).style.backgroundColor = absent;
             }
-            boxes[startIdx + i].textContent = guess[i];
-            boxes[startIdx + i].style.color = 'white';
+        }
+        
+        for (let i = 0; i < guess.length; i++){
+            setTimeout(() => {
+                flipBox(boxes[startIdx + i], guess[i], guessState[i]);
+            }, i * 500);
         }
     
         // Check if win
         if (guess === randomWord) {
-            for (let i = startIdx; i < startIdx + 5; i++) {
-                boxes[i].classList.add('win');
-            }
-
-            // Set a timeout to remove the 'win' class and change color to 'present'
             setTimeout(() => {
+                console.log("true");
                 for (let i = startIdx; i < startIdx + 5; i++) {
-                    boxes[i].classList.remove('win');
-                    boxes[i].style.backgroundColor = correct;
-                    boxes[i].style.borderColor = correct;
+                    boxes[i].classList.add('win');
                 }
-            }, 2000); // Delay in milliseconds (1000ms = 1 second)
+
+                // Set a timeout to remove the 'win' class and change color to 'present'
+                setTimeout(() => {
+                    for (let i = startIdx; i < startIdx + 5; i++) {
+                        boxes[i].classList.remove('win');
+                        boxes[i].style.backgroundColor = correct;
+                        boxes[i].style.borderColor = correct;
+                    }
+                }, 2000); // Delay in milliseconds
+            }, guess.length * 500); // Ensure this runs after all boxes have flipped
         }
     }
     
