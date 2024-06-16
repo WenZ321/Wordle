@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
    
 
     // Clears and resets everything
-    function newGame(){
+    function newGame() {
         // clears boxes 
         const boxes = document.querySelectorAll('.wordle-box');
         boxes.forEach((box) => {
@@ -240,26 +240,34 @@ document.addEventListener('DOMContentLoaded', async () => {
             back.style.backgroundColor = blank;
             back.textContent = "";
             back.style.borderColor = border;
+            box.classList.remove('flipped'); // Reset the flipped state
         });
+    
         for (let i = 0; i < letters.length; i++){
             getKeyButton(letters[i]).style.backgroundColor = border;
         }
+    
         // Updates letter frequency dictionary
         for (const letter in guessed_letters){
             if (guessed_letters[letter] === true){
                 letter_frequency[letter] += 1;
             }
         }
+    
         numberOfAttempts = 0;
         console.log(letter_frequency);
+    
         if (start_game === true){
             if (games > 1){
                 updateRandomWord();
             } else if (games === 1) {
                 updateRandomWord();
-            } else randomWord = generateRandomWord();
+            } else {
+                randomWord = generateRandomWord();
+            }
         }
         console.log(randomWord);
+    
         currentBox = 0;
         currentGuess = '';
         currentAttempt = 0;
@@ -267,16 +275,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         mustContain = [];
         mustHave = ['', '', '', '', ''];
         guessed_letters = getDictionary();
-        enableKeyboard();
+    
+        enableKeyboard(); // Ensure keyboard is enabled
         updateStats(games, wins);
         renderGuessStats();
     }
-
+    
+    // Ensure the game is reset and keyboard is enabled when clicking 'Play Again'
     document.getElementById('playAgainButton').addEventListener('click', () => {
         games += 1;
         newGame();
         playAgainButton.style.display = 'none';
     });
+    
 
 
     // Creating dictionary of true and false for tracking guessed letters
@@ -291,7 +302,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     window.onload = function() {
         sessionStorage.clear();
+        start_game = true; 
     };
+    
     
     // Runs when a key is pressed
     document.addEventListener('keydown', (e) => {
@@ -551,6 +564,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             key.disabled = false;
         });
     }
+    
     function updateColors(guess) {
         const startIdx = currentAttempt * 5; // Assuming currentAttempt is zero-based
         const boxes = document.querySelectorAll('.wordle-box');
