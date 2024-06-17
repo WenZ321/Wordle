@@ -229,64 +229,64 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Clears and resets everything
     function newGame() {
-        // clears boxes 
-        const boxes = document.querySelectorAll('.wordle-box');
-        boxes.forEach((box) => {
-            const front = box.querySelector('.front');
-            front.style.backgroundColor = blank;
-            front.textContent = "";
-            front.style.borderColor = border;
-            const back = box.querySelector('.back');
-            back.style.backgroundColor = blank;
-            back.textContent = "";
-            back.style.borderColor = border;
-            box.classList.remove('flipped'); // Reset the flipped state
-        });
-    
-        for (let i = 0; i < letters.length; i++){
-            getKeyButton(letters[i]).style.backgroundColor = border;
-        }
-    
-        // Updates letter frequency dictionary
-        for (const letter in guessed_letters){
-            if (guessed_letters[letter] === true){
-                letter_frequency[letter] += 1;
-            }
-        }
-    
-        numberOfAttempts = 0;
-        console.log(letter_frequency);
-    
-        if (start_game === true){
-            if (games > 1){
-                updateRandomWord();
-            } else if (games === 1) {
-                updateRandomWord();
-            } else {
-                randomWord = generateRandomWord();
-            }
-        }
-        console.log(randomWord);
-    
-        currentBox = 0;
-        currentGuess = '';
-        currentAttempt = 0;
-        gameOver = false;
-        mustContain = [];
-        mustHave = ['', '', '', '', ''];
-        guessed_letters = getDictionary();
-    
-        enableKeyboard(); // Ensure keyboard is enabled
-        updateStats(games, wins);
-        renderGuessStats();
-    }
-    
-    // Ensure the game is reset and keyboard is enabled when clicking 'Play Again'
-    document.getElementById('playAgainButton').addEventListener('click', () => {
-        games += 1;
-        newGame();
-        playAgainButton.style.display = 'none';
+    // clears boxes 
+    const boxes = document.querySelectorAll('.wordle-box');
+    boxes.forEach((box) => {
+        const front = box.querySelector('.front');
+        front.style.backgroundColor = blank;
+        front.textContent = "";
+        front.style.borderColor = border;
+        const back = box.querySelector('.back');
+        back.style.backgroundColor = blank;
+        back.textContent = "";
+        back.style.borderColor = border;
+        box.classList.remove('flipped'); // Reset the flipped state
     });
+
+    for (let i = 0; i < letters.length; i++){
+        getKeyButton(letters[i]).style.backgroundColor = border;
+    }
+
+    // Updates letter frequency dictionary
+    for (const letter in guessed_letters){
+        if (guessed_letters[letter] === true){
+            letter_frequency[letter] += 1;
+        }
+    }
+
+    numberOfAttempts = 0;
+    console.log(letter_frequency);
+
+    if (start_game === true){
+        if (games > 1){
+            updateRandomWord();
+        } else if (games === 1) {
+            updateRandomWord();
+        } else {
+            randomWord = generateRandomWord();
+        }
+    }
+    console.log(randomWord);
+
+    currentBox = 0;
+    currentGuess = '';
+    currentAttempt = 0;
+    gameOver = false;
+    mustContain = [];
+    mustHave = ['', '', '', '', ''];
+    guessed_letters = getDictionary();
+
+    enableKeyboard(); // Ensure keyboard is enabled
+    updateStats(games, wins);
+    renderGuessStats();
+}
+
+// Ensure the game is reset and keyboard is enabled when clicking 'Play Again'
+document.getElementById('playAgainButton').addEventListener('click', () => {
+    games += 1;
+    newGame();
+    playAgainButton.style.display = 'none';
+});
     
 
 
