@@ -1,10 +1,11 @@
-body, html {
-  overflow: hidden;
+html, body {
   height: 100vh;
+  overflow: hidden;
   padding: 0;
   margin: 0;
   font-family: Arial, sans-serif;
 }
+
 
 .main-content {
     display: flex;
@@ -27,6 +28,14 @@ h1 {
   left: 0;
 }
 
+#logo {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  margin-left: 80vh;
+}
+
+
 p {
     text-align: center;
     margin-top: 0px;  
@@ -35,6 +44,14 @@ p {
     font-weight: bold;
     padding: 0 10px;  
 }
+
+#chatBox {
+  position: absolute;
+  font-size: 25px;
+  margin-bottom: 25vh;
+  margin-left: 105vh;
+}
+
 
 .text{
   display: absolute;
@@ -186,7 +203,9 @@ p {
 .shake {
   animation: shake 0.5s;
 }
+@keyframes speak {
 
+}
 @keyframes shake {
   0% {
     transform: translate(1px);
@@ -225,51 +244,51 @@ p {
 
 /* Container for the form elements */
 .login-form {
-    position: fixed; /* Fixed positioning makes the container stay in place during scrolling */
-    top: 0; /* Align top edge with the top of the viewport */
-    right: 0; /* Align right edge with the right of the viewport */
+    position: fixed; 
+    top: 0; 
+    right: 0; 
     padding: 10px;
     display: flex;
-    flex-direction: column; /* Stack form elements vertically */
-    align-items: flex-start; /* Align form items to the start (left) */
-    width: 200px; /* Set a fixed width for the form */
+    flex-direction: column; 
+    align-items: flex-start; 
+    width: 200px; 
 }
 
 /* Container for buttons */
 .button-container {
-    display: flex; /* Enables flexbox layout */
-    width: 100%; /* Ensures container takes full width of the form */
-    justify-content: space-between; /* Spaces the buttons evenly */
-    gap: 10px; /* Adds space between buttons */
+    display: flex; 
+    width: 100%; 
+    justify-content: space-between; 
+    gap: 10px; 
 }
 
 /* General style for buttons */
 .login-form button {
-    flex: 1; /* Allows buttons to grow and fill the container equally */
+    flex: 1; 
     padding: 8px 16px;
-    border-radius: 20px; /* Makes buttons rounded */
+    border-radius: 20px; 
     color: white;
     border: none;
     cursor: pointer;
-    margin-bottom: 0; /* Removes bottom margin if previously set */
+    margin-bottom: 0; 
 }
 
 /* Specific style for the login button */
 .login-btn {
-    background-color: #007bff; /* Bootstrap blue */
+    background-color: #007bff; 
 }
 
 .login-btn:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+    background-color: #0056b3; 
 }
 
 /* Specific style for the signup button */
 .signup-btn {
-    background-color: #4CAF50; /* Green background for the sign-up button */
+    background-color: #4CAF50; 
 }
 
 .signup-btn:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #45a049; 
 }
 
 /* Style for the flash messages container */
@@ -288,14 +307,13 @@ p {
     padding: 10px 20px;
     margin-bottom: 10px;
     border-radius: 5px;
-    background-color: #f8d7da; /* Example for error messages */
-    color: #721c24; /* Example for error messages */
-    /* Add more styles as needed */
+    background-color: #f8d7da; 
+    color: #721c24; 
 }
 
 .flash-success {
-    background-color: #d4edda; /* Example for success messages */
-    color: #155724; /* Example for success messages */
+    background-color: #d4edda; 
+    color: #155724; 
 }
 
 .flash-message {
@@ -321,7 +339,7 @@ p {
 }
 
 .signout-btn {
-    background-color: #dc3545; /* Bootstrap red */
+    background-color: #dc3545; 
     color: white;
     padding: 5px 10px;
     text-decoration: none;
@@ -415,7 +433,7 @@ p {
 .stats-sidebar {
     position: fixed;
     z-index: 1000;
-    left: -250px;  /* Hide the sidebar off-screen initially */
+    left: -250px;  
     top: 0px;
     width: 250px;
     height: 100vh;
@@ -426,11 +444,11 @@ p {
     box-sizing: border-box;
     overflow-y: auto;
     overflow-x: hidden;
-    transition: left 0.3s ease;  /* Smooth transition for sliding in/out */
+    transition: left 0.3s ease;  
 }
 
 .stats-sidebar.open {
-    left: 0;  /* Move the sidebar into view */
+    left: 0;  
 }
 
 .stats-table {
@@ -471,7 +489,7 @@ p {
 }
 
 .guess-label {
-    width: 30px; /* Adjust width as needed */
+    width: 30px; 
     text-align: left;
     margin-right: 17px;
     font-weight: bold;
@@ -479,13 +497,13 @@ p {
 
 .guess-bar-fill {
     height: 20px;
-    background-color: #4CAF50; /* Green fill color */
+    background-color: #4CAF50; 
     border-radius: 5px;
     text-align: right;
     padding-right: 5px;
     box-sizing: border-box;
     color: white;
-    line-height: 20px; /* Match the height to vertically center text */
+    line-height: 20px; 
     font-size: 12px;
-    transition: width 0.5s ease-in-out; /* Smooth transition for width changes */
+    transition: width 0.5s ease-in-out; 
 }
