@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // classes need the .
     const grid = document.querySelector('.wordle-grid');
 
+    const chatBox = document.getElementById('chatBox');
+
     // div does not
     const keyboard = document.getElementById('keyboard');
     const playAgainButton = document.getElementById('playAgainButton');
@@ -468,12 +470,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.submitGuess = () => {
         if (currentGuess.length !== 5) {
             console.log("Please enter a 5-letter word.");
+            chatBox.textContent = "Please enter a 5-letter word.";
             shake();
             return; 
         }
     
         if (wordsArray.indexOf(currentGuess) === -1) {
             console.log("Not a valid 5-letter word!");
+            chatBox.textContent = "Not a valid 5-letter word!";
             shake();
             return; 
         }
@@ -512,6 +516,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (currentGuess === randomWord) {
             updateColors(currentGuess);
+            chatBox.textContent = "You Win!";
             console.log("You Win!");
             currentAttempt++;
             guessed_words[randomWord] = currentAttempt;
@@ -528,11 +533,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             }, 3000);
             currentGuess = '';
         } else {
+            chatBox.textContent = "";
             updateColors(currentGuess);
             console.log("Guess submitted:", currentGuess);
             currentAttempt++;
             if (currentAttempt >= 6) {
                 console.log("Game over! The word was: " + randomWord);
+                chatBox.textContent = "Game over! The word was: " + randomWord;
                 guessed_words[randomWord] = 10;
                 possibleWords = possibleWords.filter(item => item !== randomWord);
                 disableKeyboard(); 
@@ -691,6 +698,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return dic;
     }
     
+
     function shake(){
         const boxes = document.querySelectorAll('.wordle-box');
         const startIdx = currentAttempt * 5;
@@ -705,7 +713,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             isAnimating = false;
         }, 500);
     }
-    
+
+
     newGame();
     
     submitPreviousGuesses(game_guesses);
