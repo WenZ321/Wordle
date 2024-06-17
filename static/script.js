@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let guessed_letters = getDictionary();
     let start_game = false;
     let isAnimating = false;
+    let win = false;
     
     // Update the wins
     for (const [word, guessCount] of Object.entries(userData)) {
@@ -385,7 +386,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ dic: dic, test: test, frequency: freq}),
+            body: JSON.stringify({ dic: dic, test: test, frequency: freq, win: win}),
         });
 
         if (!response.ok) {
@@ -517,6 +518,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             possibleWords = possibleWords.filter(item => item !== randomWord);
             disableKeyboard();
             gameOver = true;
+            win = true;
             if (start_game){
                 update_game(currentGuess, gameOver);
             }
@@ -535,6 +537,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 possibleWords = possibleWords.filter(item => item !== randomWord);
                 disableKeyboard(); 
                 gameOver = true;
+                win = false;
                 playAgainButton.style.display = 'inline-block';
             }
             if (start_game){
@@ -635,6 +638,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 }, 2000); // Delay in milliseconds
             }, guess.length * 400); // Ensure this runs after all boxes have flipped
+            win = true;
         }
     }
     

@@ -266,6 +266,7 @@ def choose_new_word_api():
     dic = content.get('dic', {})
     test_words = content.get('test', [])  # This should match the expected structure in `choose_new_word`
     letter_frequency = content.get('frequency', {})
+    win = content.get('win', bool)
     
     if 'username' in session:    
         username = session['username']
@@ -292,6 +293,18 @@ def choose_new_word_api():
                     cur.execute("UPDATE users SET num_games = ? WHERE username = ?", (len(dic), username))
                     serialized_data = json.dumps(letter_frequency)
                     cur.execute("UPDATE users SET user_data = ? WHERE username = ?", (serialized_data, username))
+            cur.execute("SELECT current_win_streak FROM users WHERE username = ?", (username,))
+            current_win_streak = cur.fetchone()[0]
+            max_win_streak = cur.execute("SELECT max_win_streak FROM users WHERE username = ?", (username,))
+            max_win_streak = cur.fetchone()[0]
+            if win:
+                current_win_streak += 1
+                cur.execute("UPDATE users SET current_win_streak = ? WHERE username = ?", (current_win_streak, username))
+                if current_win_streak > max_win_streak:
+                    cur.execute("UPDATE users SET max_win_streak = ? WHERE username = ?", (current_win_streak, username))
+                
+            else:
+                cur.execute("UPDATE users SET current_win_streak = ? WHERE username = ?", (0, username))
             
     result_word = choose_new_word(dic, test_words, letter_frequency)
     set_last_word(result_word)
