@@ -2,9 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="498863964594-3e370ec950subufrmeshkjnpehuvvids.apps.googleusercontent.com">
     <title>Wordle Game</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    gapi.load('auth2', function() {
+        gapi.auth2.init();
+    });
 </head>
 <body>
     <div class="sidebar-toggle">
@@ -92,6 +97,7 @@
                 <span id="toggleLabel">Hard Mode: OFF</span>
             </div>
         {% else %}
+        <div class="g-signin2" data-onsuccess="onSignIn"></div>
             <!-- The existing login container -->
             <div class="login-container">
                 <form class="login-form" action="/login" method="POST">
@@ -102,7 +108,8 @@
                         <a href="{{ url_for('register') }}" class="signup-btn-link"><button type="button" class="signup-btn">Sign Up</button></a>
                     </div>
                 </form>
-            </div>
+                <!-- Google Sign-In button -->
+
             <div class="toggle-container">
                 <label class="switch">
                     <input type="checkbox" id="toggleHardMode">

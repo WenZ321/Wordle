@@ -6,11 +6,15 @@ import sqlite3
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
 import json
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 app = Flask(__name__)
 CORS(app)
 secret_key = os.urandom(24)
-app.secret_key = os.environ.get('SECRET_KEY') or 'optional_default_key'  # Necessary for session management and flashing messages
+app.secret_key = os.environ.get('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') or 'optional_default_key'  # Necessary for session management and flashing messages
+
+GOOGLE_CLIENT_ID = '498863964594-3e370ec950subufrmeshkjnpehuvvids.apps.googleusercontent.com'
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -77,6 +81,8 @@ def logout():
     session.pop('username', None)
     flash('You have been logged out.', 'success')
     return redirect(url_for('home'))
+
+
 
 def validate_login(acc_username, password):
     basedir = os.path.abspath(os.path.dirname(__file__))
@@ -258,7 +264,6 @@ def fetch_user_data(username):
     letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     dic = {letter: 0 for letter in letters}
     return dic, {}, 0
-
 
 @app.route('/choose_new_word', methods=['POST'])
 def choose_new_word_api():

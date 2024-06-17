@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    
+    // Existing DOMContentLoaded code
     console.log('Letter Frequencies:', letterFrequency);
     console.log('User Game Data:', userData);
     console.log('Number of games:', num_games);
@@ -11,7 +11,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             message.classList.add('flash-message-hide');
         }, 2000);
     });
-    
+    gapi.load('auth2', function() {
+        gapi.auth2.init();
+    });
     // classes need the .
     const grid = document.querySelector('.wordle-grid');
 
