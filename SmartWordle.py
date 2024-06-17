@@ -248,11 +248,11 @@ def fetch_user_data(username):
             # Convert list of tuples into a dictionary of word: guess
             user_data = {word: guess for word, guess in games_data}
 
-        cur.execute("SELECT num_games FROM users WHERE username = ?", (username,))
-        result = cur.fetchone()
-        
-        # Return both letter frequencies and game data
-        return letter_freq, user_data, result[0]
+            cur.execute("SELECT num_games FROM users WHERE username = ?", (username,))
+            result = cur.fetchone()
+
+            # Return both letter frequencies and game data
+            return letter_freq, user_data, result[0]
 
     # If no data is found, return empty structures
     letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
