@@ -47,7 +47,7 @@ p {
 
 #chatBox {
   position: absolute;
-  font-size: 25px;
+  font-size: 2vh;
   margin-bottom: 25vh;
   margin-left: 105vh;
 }
