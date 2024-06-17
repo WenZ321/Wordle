@@ -1,9 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    
+
     console.log('Letter Frequencies:', letterFrequency);
     console.log('User Game Data:', userData);
     console.log('Number of games:', num_games);
-    
+
+    let isAnimating = false;
+
     const messages = document.querySelectorAll('.flash-message');
     // Set a timeout to hide each message after 2 seconds
     messages.forEach((message) => {
@@ -11,21 +13,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             message.classList.add('flash-message-hide');
         }, 2000);
     });
-    
+
     // classes need the .
     const grid = document.querySelector('.wordle-grid');
 
     // div does not
     const keyboard = document.getElementById('keyboard');
     const playAgainButton = document.getElementById('playAgainButton');
-    
+
     // Correct = green, present = yellow, absent = gray
     const correct = 'rgb(106, 170, 100)';
     const present = 'rgb(201, 180, 88)';
     const absent = 'rgb(120, 124, 126)';
     const blank = 'rgb(255, 255, 255)';
     const border = 'rgb(211,214,218)';
-    
+
     // Sidebar
     const toggleSidebarButton = document.getElementById('toggleSidebarButton');
     const statsSidebar = document.getElementById('statsSidebar');
@@ -36,12 +38,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     let gameOver = false;
     let currentAttempt = 0;
     let randomWord = "";
-    let games = num_games
+    let games = num_games;
     let wins = 0;
     let letter_frequency = letterFrequency;
     let guessed_letters = getDictionary();
     let start_game = false;
-    
+
     // Update the wins
     for (const [word, guessCount] of Object.entries(userData)) {
         if (guessCount <= 6) {
@@ -51,10 +53,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let wordsArray = [];
     let possibleWords = [];
-    
+
     const guessed_words = userData;
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    
+
     let hardMode = false;
     let mustHave = ['', '', '', '', ''];
     let mustContain = [];
@@ -69,17 +71,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Add event listener to the toggle hard mode switch
     const toggleHardModeSwitch = document.getElementById('toggleHardMode');
-    
+
     const toggleContainer = document.querySelector('.toggle-container');
     console.log(toggleContainer);
-    if (!session){
+    if (!session) {
         toggleContainer.classList.add('logged-out-position');
     }
-    
+
     toggleHardModeSwitch.addEventListener('change', () => {
         toggleHardMode();
     });
-    
+
     // For sidebar
     toggleSidebarButton.addEventListener('click', () => {
         statsSidebar.classList.toggle('open');
@@ -89,13 +91,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     await fetch('/static/words.txt')
         // converts words.txt to a string 
         .then(response => response.text())
-
         // processing the file as a text
         .then(text => {
             // Split the text by new line to create an array
             wordsArray = text.split('\n').map(word => word.trim()).filter(word => word.length > 0);
             console.log("Words loaded from file:", wordsArray);
-            for(let i = 0; i < wordsArray.length; i++){
+            for (let i = 0; i < wordsArray.length; i++) {
                 wordsArray[i] = wordsArray[i].toUpperCase();
             }
             possibleWords = wordsArray.map(item => item);
@@ -104,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         .catch(err => {
             console.error('Problem reading the file:', err);
         });
-        
+
     // Creates the boxes
     for (let i = 0; i < 29; i++) {
         const box = document.createElement('div');
@@ -121,9 +122,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         grid.appendChild(box);
     }
 
-
-    // 
     function handleKeyPress(key) {
+        if (isAnimating) return; // Prevent input if animation is ongoing
+
         if (key === 'Delete') {
             if (currentGuess.length !== 0) {
                 currentGuess = currentGuess.slice(0, -1);
@@ -170,10 +171,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Generates random word
-    function generateRandomWord(){
+    function generateRandomWord() {
         const randomIndex = Math.floor(Math.random() * wordsArray.length);
         return wordsArray[randomIndex];
-    } 
+    }
 
     function updateStats(games, wins) {
         document.getElementById('games-played').textContent = games;
@@ -182,7 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     updateStats(games, wins);
-    
+
     function renderGuessStats() {
         const totalGames = games;
         const guessStats = Array(7).fill(0); // 6 for guesses 1-6 and 1 for losses
@@ -225,73 +226,70 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     renderGuessStats();
-   
 
     // Clears and resets everything
     function newGame() {
-    // clears boxes 
-    const boxes = document.querySelectorAll('.wordle-box');
-    boxes.forEach((box) => {
-        const front = box.querySelector('.front');
-        front.style.backgroundColor = blank;
-        front.textContent = "";
-        front.style.borderColor = border;
-        const back = box.querySelector('.back');
-        back.style.backgroundColor = blank;
-        back.textContent = "";
-        back.style.borderColor = border;
-        box.classList.remove('flipped'); // Reset the flipped state
+        // clears boxes 
+        const boxes = document.querySelectorAll('.wordle-box');
+        boxes.forEach((box) => {
+            const front = box.querySelector('.front');
+            front.style.backgroundColor = blank;
+            front.textContent = "";
+            front.style.borderColor = border;
+            const back = box.querySelector('.back');
+            back.style.backgroundColor = blank;
+            back.textContent = "";
+            back.style.borderColor = border;
+            box.classList.remove('flipped'); // Reset the flipped state
+        });
+
+        for (let i = 0; i < letters.length; i++) {
+            getKeyButton(letters[i]).style.backgroundColor = border;
+        }
+
+        // Updates letter frequency dictionary
+        for (const letter in guessed_letters) {
+            if (guessed_letters[letter] === true) {
+                letter_frequency[letter] += 1;
+            }
+        }
+
+        numberOfAttempts = 0;
+        console.log(letter_frequency);
+
+        if (start_game === true) {
+            if (games > 1) {
+                updateRandomWord();
+            } else if (games === 1) {
+                updateRandomWord();
+            } else {
+                randomWord = generateRandomWord();
+            }
+        }
+        console.log(randomWord);
+
+        currentBox = 0;
+        currentGuess = '';
+        currentAttempt = 0;
+        gameOver = false;
+        mustContain = [];
+        mustHave = ['', '', '', '', ''];
+        guessed_letters = getDictionary();
+
+        enableKeyboard(); // Ensure keyboard is enabled
+        updateStats(games, wins);
+        renderGuessStats();
+    }
+
+    // Ensure the game is reset and keyboard is enabled when clicking 'Play Again'
+    document.getElementById('playAgainButton').addEventListener('click', () => {
+        games += 1;
+        newGame();
+        playAgainButton.style.display = 'none';
     });
 
-    for (let i = 0; i < letters.length; i++){
-        getKeyButton(letters[i]).style.backgroundColor = border;
-    }
-
-    // Updates letter frequency dictionary
-    for (const letter in guessed_letters){
-        if (guessed_letters[letter] === true){
-            letter_frequency[letter] += 1;
-        }
-    }
-
-    numberOfAttempts = 0;
-    console.log(letter_frequency);
-
-    if (start_game === true){
-        if (games > 1){
-            updateRandomWord();
-        } else if (games === 1) {
-            updateRandomWord();
-        } else {
-            randomWord = generateRandomWord();
-        }
-    }
-    console.log(randomWord);
-
-    currentBox = 0;
-    currentGuess = '';
-    currentAttempt = 0;
-    gameOver = false;
-    mustContain = [];
-    mustHave = ['', '', '', '', ''];
-    guessed_letters = getDictionary();
-
-    enableKeyboard(); // Ensure keyboard is enabled
-    updateStats(games, wins);
-    renderGuessStats();
-}
-
-// Ensure the game is reset and keyboard is enabled when clicking 'Play Again'
-document.getElementById('playAgainButton').addEventListener('click', () => {
-    games += 1;
-    newGame();
-    playAgainButton.style.display = 'none';
-});
-    
-
-
     // Creating dictionary of true and false for tracking guessed letters
-    function getDictionary(){
+    function getDictionary() {
         const dic = {};
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         for (const letter of letters) {
@@ -300,37 +298,28 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
         return dic;
     }
 
-    window.onload = function() {
+    window.onload = function () {
         sessionStorage.clear();
-        start_game = true; 
+        start_game = true;
     };
-    
-    
+
     // Runs when a key is pressed
     document.addEventListener('keydown', (e) => {
-        // Check if the game is over or if the focus is on an input field
-        if (gameOver || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT') {
-            return; // Ignore the event if the game is over or the focus is on input, textarea, or select
+        if (isAnimating || gameOver || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT') {
+            return; // Ignore the event if the game is over, an animation is ongoing, or the focus is on input, textarea, or select
         }
 
         const key = e.key.toUpperCase();
         if (key.length === 1 && key >= 'A' && key <= 'Z') {
-            if (currentGuess.length < 5) {
-                currentGuess += key;
-                displayLetterOnGrid(key);
-            }
+            handleKeyPress(key);
         } else if (key === 'BACKSPACE' || e.key === 'Delete') {
-            if(currentGuess.length !== 0){
-                currentGuess = currentGuess.slice(0, -1);
-                removeLetterOnGrid();
-            }
+            handleKeyPress('Delete');
         } else if (key === 'ENTER') {
-            window.submitGuess();
+            handleKeyPress('Enter');
         }
     });
-    
 
-    function displayLetterOnGrid(letter){
+    function displayLetterOnGrid(letter) {
         const boxes = document.querySelectorAll('.wordle-box');
         const front = boxes[currentBox].querySelector('.front');
         front.textContent = letter;
@@ -339,14 +328,14 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
         currentBox++;
     }
 
-    function removeLetterOnGrid(){
+    function removeLetterOnGrid() {
         const boxes = document.querySelectorAll('.wordle-box');
         currentBox--;
         const front = boxes[currentBox].querySelector('.front');
         front.textContent = "";
         front.style.borderColor = border;
     }
-    
+
     // Function to flip the boxes
     function flipBox(box, letter, state) {
         const front = box.querySelector('.front');
@@ -376,7 +365,7 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
         // Add the flipped class to trigger the animation
         box.classList.add('flipped');
     }
-    
+
     // Chooses new word
     async function getNewWord(dic, test, freq) {
         const response = await fetch('/choose_new_word', {
@@ -384,7 +373,7 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ dic: dic, test: test, frequency: freq}),
+            body: JSON.stringify({ dic: dic, test: test, frequency: freq }),
         });
 
         if (!response.ok) {
@@ -392,12 +381,12 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
         }
 
         const data = await response.json();
-        
+
         const word = String(data.word); // Convert the result to a string
         console.log(word);  // Use the returned word as needed, now guaranteed to be a string
         return word;
     }
-    
+
     // Calls the function that generates the new word
     async function updateRandomWord() {
         try {
@@ -407,33 +396,31 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
             console.error("Failed to get new word:", error);
         }
     }
-    
-    async function update_game(guess, game_over){
-        const response = await fetch('/update_game',{
+
+    async function update_game(guess, game_over) {
+        const response = await fetch('/update_game', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ guess: guess, game_over: game_over}),
+            headers: { 'Content-Type': 'application/json', },
+            body: JSON.stringify({ guess: guess, game_over: game_over }),
         });
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
     }
-    
+
     async function setRandom(word) {
-        const response = await fetch('/set_last',{
+        const response = await fetch('/set_last', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ word: word}),
+            headers: { 'Content-Type': 'application/json', },
+            body: JSON.stringify({ word: word }),
         });
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
     }
-    
+
     // Define the async function get_game_data
     async function get_game_data() {
         try {
@@ -450,58 +437,59 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
 
             const data = await response.json();
             randomWord = String(data.randomWord).toUpperCase();
-            if (randomWord === ''){
+            if (randomWord === '') {
                 randomWord = generateRandomWord();
                 setRandom(randomWord);
             }
-            console.log(randomWord)
-            return data.guesses // Ensure the function returns the guesses array
+            console.log(randomWord);
+            return data.guesses; // Ensure the function returns the guesses array
         } catch (error) {
             console.error('Failed to fetch game data:', error);
             return [];
         }
     }
 
-    
     window.submitGuess = () => {
+        if (isAnimating) return; // Prevent submission if animation is ongoing
+
         if (currentGuess.length !== 5) {
             console.log("Please enter a 5-letter word.");
-            return; 
+            return;
         }
-    
+
         if (wordsArray.indexOf(currentGuess) === -1) {
             console.log("Not a valid 5-letter word!");
-            return; 
+            return;
         }
-        
-        if (hardMode === true){
-            for (let i = 0; i < 5; i++){
-                if (mustHave[i] != currentGuess[i] && mustHave[i] != ''){
+
+        if (hardMode === true) {
+            for (let i = 0; i < 5; i++) {
+                if (mustHave[i] != currentGuess[i] && mustHave[i] != '') {
                     let end = "st";
-                    if (i === 1){
+                    if (i === 1) {
                         end = "nd";
-                    } else if (i === 2){
+                    } else if (i === 2) {
                         end = "rd";
-                    } else if (i === 3 || i === 4){
+                    } else if (i === 3 || i === 4) {
                         end = "th";
                     }
                     console.log(i + 1 + end + " letter must be " + mustHave[i]);
                     return;
                 }
             }
-            for (let i = 0; i < mustContain.length; i++){
-                if (!currentGuess.includes(mustContain[i])){
+            for (let i = 0; i < mustContain.length; i++) {
+                if (!currentGuess.includes(mustContain[i])) {
                     console.log("Guess must contain " + mustContain[i]);
                     return;
                 }
             }
         }
-    
-        for(let i = 0; i < currentGuess.length; i++){
+
+        for (let i = 0; i < currentGuess.length; i++) {
             const letter = currentGuess[i];
             guessed_letters[letter] = true;
         }
-        
+
         console.log('Updated Dictionary:', guessed_letters);
 
         if (currentGuess === randomWord) {
@@ -512,7 +500,7 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
             possibleWords = possibleWords.filter(item => item !== randomWord);
             disableKeyboard();
             gameOver = true;
-            if (start_game){
+            if (start_game) {
                 update_game(currentGuess, gameOver);
             }
             wins++;
@@ -528,19 +516,19 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
                 console.log("Game over! The word was: " + randomWord);
                 guessed_words[randomWord] = 10;
                 possibleWords = possibleWords.filter(item => item !== randomWord);
-                disableKeyboard(); 
+                disableKeyboard();
                 gameOver = true;
                 playAgainButton.style.display = 'inline-block';
             }
-            if (start_game){
+            if (start_game) {
                 update_game(currentGuess, gameOver);
             }
             currentGuess = '';
         }
     };
-    
+
     let game_guesses = await get_game_data();
-    
+
     console.log(game_guesses);
 
     function submitPreviousGuesses(guesses) {
@@ -550,11 +538,11 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
         }
         currentBox = currentAttempt * 5;
     }
-    
+
     function disableKeyboard() {
         const keys = document.querySelectorAll('.key');
         keys.forEach(key => {
-            key.disabled = true; 
+            key.disabled = true;
         });
     }
 
@@ -564,14 +552,16 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
             key.disabled = false;
         });
     }
-    
+
     function updateColors(guess) {
         const startIdx = currentAttempt * 5; // Assuming currentAttempt is zero-based
         const boxes = document.querySelectorAll('.wordle-box');
         let dictionary = createLetterCountDictionary(randomWord);
-        let guessState = ['absent', 'absent', 'absent', 'absent', 'absent']
+        let guessState = ['absent', 'absent', 'absent', 'absent', 'absent'];
         console.log(randomWord);
-    
+
+        isAnimating = true; // Start animation
+
         for (let i = 0; i < guess.length; i++) {
             if (guess[i] === randomWord[i]) {
                 guessState[i] = 'correct';
@@ -586,16 +576,16 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
                 if (dictionary[guess[i]] > 0 && guessState[i] != 'correct') {
                     guessState[i] = 'present';
                     dictionary[guess[i]] -= 1;
-                    if (!mustContain.includes(guess[i])){
+                    if (!mustContain.includes(guess[i])) {
                         mustContain.push(guess[i]);
                         console.log(mustContain);
                     }
-                    if (getKeyButton(guess[i]).style.backgroundColor != correct){
+                    if (getKeyButton(guess[i]).style.backgroundColor != correct) {
                         getKeyButton(guess[i]).style.backgroundColor = present;
                     }
-                } else if (guessState[i] != 'correct'){
+                } else if (guessState[i] != 'correct') {
                     guessState[i] = 'absent';
-                    if (getKeyButton(guess[i]).style.backgroundColor != present && getKeyButton(guess[i]).style.backgroundColor != correct){
+                    if (getKeyButton(guess[i]).style.backgroundColor != present && getKeyButton(guess[i]).style.backgroundColor != correct) {
                         getKeyButton(guess[i]).style.backgroundColor = absent;
                     }
                 }
@@ -604,13 +594,18 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
                 getKeyButton(guess[i]).style.backgroundColor = absent;
             }
         }
-        
-        for (let i = 0; i < guess.length; i++){
+
+        for (let i = 0; i < guess.length; i++) {
             setTimeout(() => {
                 flipBox(boxes[startIdx + i], guess[i], guessState[i]);
+                if (i === guess.length - 1) {
+                    setTimeout(() => {
+                        isAnimating = false; // End animation
+                    }, 500); // Slight delay to ensure the last animation completes
+                }
             }, i * 500);
         }
-    
+
         // Check if win
         if (guess === randomWord) {
             setTimeout(() => {
@@ -627,23 +622,22 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
             }, guess.length * 500); // Ensure this runs after all boxes have flipped
         }
     }
-    
-    
+
     // Function to get the button DOM element for a specific letter
     function getKeyButton(letter) {
         // Select all buttons with class 'key'
         const buttons = document.querySelectorAll('.key');
-  
+
         // Iterate over the buttons to find the one that matches the letter
         for (const btn of buttons) {
-          if (btn.textContent === letter) {
-            return btn; // Return the button that matches the letter
-          }
+            if (btn.textContent === letter) {
+                return btn; // Return the button that matches the letter
+            }
         }
-  
+
         return null; // If no button matches the letter, return null
-      }
-    
+    }
+
     function createLetterCountDictionary(word) {
         let letterCount = {};
 
@@ -667,7 +661,7 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
 
         return letterCount;
     }
-    
+
     function generateLetterFreqDic() {
         const dic = {};
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -676,11 +670,11 @@ document.getElementById('playAgainButton').addEventListener('click', () => {
         }
         return dic;
     }
-    
+
     newGame();
-    
+
     submitPreviousGuesses(game_guesses);
-    
+
     start_game = true;
 
 });
