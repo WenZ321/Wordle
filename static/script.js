@@ -20,6 +20,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // div does not
     const keyboard = document.getElementById('keyboard');
     const playAgainButton = document.getElementById('playAgainButton');
+    const leaderboardIcon = document.getElementById('leaderboardIcon');
+    const leaderboardPopup = document.getElementById('leaderboardPopup');
+    const closeButton = document.getElementById('closeButton');
+    const leaderboardSelect = document.getElementById('leaderboardSelect');
+    const leaderboardBody = document.getElementById('leaderboardBody');
+    const playerRankBody = document.getElementById('playerRankBody');
     
     // Correct = green, present = yellow, absent = gray
     const correct = 'rgb(106, 170, 100)';
@@ -88,6 +94,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     toggleSidebarButton.addEventListener('click', () => {
         statsSidebar.classList.toggle('open');
     });
+    
+    leaderboardIcon.addEventListener('click', () => {
+        leaderboardPopup.style.display = 'block';
+    });
+
+    closeButton.addEventListener('click', () => {
+        leaderboardPopup.style.display = 'none';
+    });
+    
+    window.addEventListener('click', (event) => {
+        if (!leaderboardPopup.contains(event.target) && event.target !== leaderboardIcon) {
+            leaderboardPopup.style.display = 'none';
+        }
+    });
+    
+    leaderboardSelect.value = 'win_streak';
+    
+    leaderboardSelect.addEventListener('change', () => {
+        const selectedLeaderboard = leaderboardSelect.value;
+        // Fetch and display the leaderboard data based on the selection
+        updateLeaderboard(selectedLeaderboard);
+    });
+    
+    const event = new Event('change');
+    leaderboardSelect.dispatchEvent(event);
 
     //reads the list of words
     await fetch('/static/words.txt')
@@ -713,7 +744,81 @@ document.addEventListener('DOMContentLoaded', async () => {
             isAnimating = false;
         }, 500);
     }
+    
+    async function updateLeaderboard(leaderboardType) {
+        try {
+            const data = await fetchLeaderboardData(leaderboardType);
+            displayLeaderboard(data);
+        } catch (error) {
+            console.error('Error updating leaderboard:', error);
+        }
+    }
 
+    function displayLeaderboard(data) {
+        const leaderboardBody = document.getElementById('leaderboard-body');
+        if (!leaderboardBody) {
+            console.error('leaderboard-body element not found');
+            return;
+        }
+
+        console.log('data', data);
+        leaderboardBody.innerHTML = '';  // Clear existing content
+
+        for (let i = 0; i < data.length; i++) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${i + 1}</td>
+                <td>${String(data[i].player)}</td>
+                <td>${data[i].score}</td>
+            `;
+            leaderboardBody.appendChild(row);
+        }
+    }
+
+    async function fetchLeaderboardData(leaderboardType) {
+        try {
+            const leaderboard = await getLeaderBoardData();
+
+            const data = {
+                win_streak: leaderboard.win_streak,
+                wins: leaderboard.wins,
+                average_guesses: leaderboard.average_guesses
+            };
+
+            console.log(data); // Debugging line
+            return data[leaderboardType];
+        } catch (error) {
+            console.error('Error fetching leaderboard data:', error);
+        }
+    }
+
+    async function getLeaderBoardData(){
+        const response = await fetch('/get_leaderboard_data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        const leaderboard_win_streak = data.win_streak;
+        const leaderboard_wins = data.wins;
+        const leaderboard_guesses = data.guesses;
+
+        console.log("streak", leaderboard_win_streak);
+        console.log("wins", leaderboard_wins);
+        console.log("guesses", leaderboard_guesses);
+
+        return {
+            win_streak: leaderboard_win_streak,
+            wins: leaderboard_wins,
+            average_guesses: leaderboard_guesses
+        };
+    }
 
     newGame();
     

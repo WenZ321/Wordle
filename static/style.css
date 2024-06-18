@@ -477,6 +477,135 @@ p {
     background-color: #eee;
 }
 
+/* Leaderboard */
+/* Leaderboard Icon */
+.leaderboard-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #FFD700;
+    color: #FFF;
+    font-size: 36px;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Leaderboard Popup */
+.leaderboard-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background-color: #2a2a2a;
+    border: 2px solid #444;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.leaderboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.leaderboard-header h2 {
+    margin: 0;
+    color: #00bfff;
+    align-items: center;
+    width: 400px;
+}
+
+.leaderboard-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.leaderboard-selection {
+    margin: 15px 0;
+}
+
+.leaderboard-selection label {
+    margin-right: 10px;
+}
+
+.leaderboard-selection select {
+    padding: 5px;
+    background-color: #333;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 5px;
+}
+
+.leaderboard-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.leaderboard-table th, .leaderboard-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    color: white;
+}
+
+#playerRankSection {
+    margin-top: 20px;
+}
+
+.highlighted {
+    background-color: yellow; /* Highlight color */
+}
+
+.leaderboard-table th, .leaderboard-table td {
+    border: 1px solid #444;
+    padding: 10px;
+}
+
+.leaderboard-table th {
+    background-color: #333;
+}
+
+.leaderboard-table td {
+    background-color: #555;
+}
+
+.leaderboard-table tbody tr:nth-child(odd) {
+    background-color: #444;
+}
+
+.leaderboard-table tbody tr:nth-child(even) {
+    background-color: #555;
+}
+
+.close-button {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+}
+
+.close-button:hover {
+    color: gray;
+}
+
 /* for stats for games for each guess # */
 #guess-stats {
     margin-top: 20px;

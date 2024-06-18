@@ -40,7 +40,11 @@ def register():
                     password_hash TEXT NOT NULL,
                     user_data TEXT, 
                     num_games INT,
-                    last_word TEXT
+                    last_word TEXT,
+                    current_win_streak INTEGER DEFAULT 0,
+                    max_win_streak INTEGER DEFAULT 0,
+                    wins INTEGER DEFAULT 0,
+                    average_guesses INTEGER DEFAULT 0
                 );
             ''')
 
@@ -259,7 +263,27 @@ def fetch_user_data(username):
     dic = {letter: 0 for letter in letters}
     return dic, {}, 0
 
-
+@app.route('/get_leaderboard_data', methods=['POST'])
+def get_leaderboard_data():
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    database_path = os.path.join(basedir, 'db', 'users.db')
+    
+    # Use context manager for handling the database connection
+    with sqlite3.connect(database_path) as conn:
+        cur = conn.cursor()
+        
+        # Get max_win_streak data
+        cur.execute("SELECT username, max_win_streak FROM users ORDER BY max_win_streak DESC")
+        max_win_streak_data = cur.fetchall()
+        win_streak_list = [{'player': row[0], 'score': row[1]} for row in max_win_streak_data]
+        cur.execute("SELECT username, wins FROM users ORDER BY wins DESC")
+        wins_data = cur.fetchall()
+        wins_list = [{'player': row[0], 'score': row[1]} for row in wins_data ]
+        cur.execute("SELECT username, average_guesses FROM users ORDER BY average_guesses DESC")
+        guesses_data = cur.fetchall()
+        guesses_list = [{'player': row[0], 'score': row[1]} for row in guesses_data]
+        return jsonify({'win_streak': win_streak_list, 'wins': wins_list, 'guesses': guesses_list})
+       
 @app.route('/choose_new_word', methods=['POST'])
 def choose_new_word_api():
     content = request.json
@@ -295,9 +319,18 @@ def choose_new_word_api():
                     cur.execute("UPDATE users SET user_data = ? WHERE username = ?", (serialized_data, username))
             cur.execute("SELECT current_win_streak FROM users WHERE username = ?", (username,))
             current_win_streak = cur.fetchone()[0]
-            max_win_streak = cur.execute("SELECT max_win_streak FROM users WHERE username = ?", (username,))
+            cur.execute("SELECT max_win_streak FROM users WHERE username = ?", (username,))
             max_win_streak = cur.fetchone()[0]
+            cur.execute("SELECT wins FROM users WHERE username = ?", (username,))
+            wins = cur.fetchone()[0]
+            cur.execute("SELECT average_guesses FROM users WHERE username = ?", (username,))
+            average_guesses = cur.fetchone()[0]
+            cur.execute("SELECT num_games FROM users WHERE username = ?", (username,))
+            games = cur.fetchone()[0]
+            average_guesses *= (games - 1)
+            cur.execute("UPDATE users SET average_guesses = ? WHERE username = ?", ((average_guesses + most_recent_guess) / games, username))
             if win:
+                cur.execute("UPDATE users SET wins = ? WHERE username = ?", (wins + 1, username))
                 current_win_streak += 1
                 cur.execute("UPDATE users SET current_win_streak = ? WHERE username = ?", (current_win_streak, username))
                 if current_win_streak > max_win_streak:

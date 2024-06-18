@@ -114,5 +114,32 @@
             </div>
         {% endif %}
     </div>
+    <div class="leaderboard-icon" id="leaderboardIcon">🏆</div>
+    <div class="leaderboard-popup" id="leaderboardPopup">
+        <div class="leaderboard-header">
+            <h2>LEADERBOARD</h2>
+            <span class="close-button" id="closeButton">&times;</span>
+        </div>
+        <div class="leaderboard-selection">
+            <label for="leaderboardSelect">Select Leaderboard:</label>
+            <select id="leaderboardSelect">
+                <option value="win_streak" selected>Max Win Streak</option>
+                <option value="wins">Max Wins</option>
+                <option value="average_guesses">Average Guesses</option>
+            </select>
+        </div>
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+                <!-- Leaderboard content will be populated here -->
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
