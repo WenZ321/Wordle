@@ -279,10 +279,19 @@ def get_leaderboard_data():
         cur.execute("SELECT username, wins FROM users ORDER BY wins DESC")
         wins_data = cur.fetchall()
         wins_list = [{'player': row[0], 'score': row[1]} for row in wins_data ]
-        cur.execute("SELECT username, average_guesses FROM users ORDER BY average_guesses DESC")
+        cur.execute("SELECT username, average_guesses FROM users WHERE average_guesses != 0 ORDER BY average_guesses ASC")
         guesses_data = cur.fetchall()
         guesses_list = [{'player': row[0], 'score': row[1]} for row in guesses_data]
         return jsonify({'win_streak': win_streak_list, 'wins': wins_list, 'guesses': guesses_list})
+    
+@app.route('/get_username', methods=['POST'])
+def get_username():
+    if 'username' in session:
+        username = session['username']
+        return jsonify({'username': username})
+    else:
+        return jsonify({'username': None})
+        
        
 @app.route('/choose_new_word', methods=['POST'])
 def choose_new_word_api():

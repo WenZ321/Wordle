@@ -128,19 +128,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       messageElement.className = 'message';
       messageElement.textContent = message;
 
-      chatBox.appendChild(messageElement);
+      chatBox.prepend(messageElement); // Add message to the top
+      messageElement.style.display = 'block'; // Ensure the message is displayed
       messageQueue.push(messageElement);
 
-      messageElement.style.display = 'block';
-
       setTimeout(() => {
-        messageElement.style.opacity = '0';
+        messageElement.classList.add('message-disappearing'); // Add disappearing class to fade out
+
         setTimeout(() => {
-          chatBox.removeChild(messageElement);
-          messageQueue.shift();
-          updateMessagePositions();
-        }, 1000);
-      }, 2000);
+          chatBox.removeChild(messageElement); // Remove the message from the DOM
+          messageQueue.shift(); // Remove the first message from the queue
+        }, 1000); // Wait for the fade-out transition to complete
+      }, 2000); // Display the message for 2 seconds
     }
 
     function updateMessagePositions() {
@@ -360,12 +359,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Runs when a key is pressed
     document.addEventListener('keydown', (e) => {
+        const key = e.key.toUpperCase();
         // Check if the game is over or if the focus is on an input field
-        if (isAnimating || gameOver || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT') {
+        if ((isAnimating && key != 'ENTER')|| gameOver || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT') {
             return; // Ignore the event if the game is over or the focus is on input, textarea, or select
         }
+        
 
-        const key = e.key.toUpperCase();
         if (key.length === 1 && key >= 'A' && key <= 'Z') {
             if (currentGuess.length < 5) {
                 currentGuess += key;
@@ -762,6 +762,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     function shake(){
         const boxes = document.querySelectorAll('.wordle-box');
         const startIdx = currentAttempt * 5;
+        if (isAnimating){
+            return;
+        }
         for (let i = startIdx; i < startIdx + 5; i++){
             boxes[i].classList.add('shake');
         }
@@ -777,13 +780,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function updateLeaderboard(leaderboardType) {
         try {
             const data = await fetchLeaderboardData(leaderboardType);
-            displayLeaderboard(data);
+            const username = await getUsername();
+            displayLeaderboard(data, username);
         } catch (error) {
             console.error('Error updating leaderboard:', error);
         }
     }
 
-    function displayLeaderboard(data) {
+    function displayLeaderboard(data, username) {
         const leaderboardBody = document.getElementById('leaderboard-body');
         if (!leaderboardBody) {
             console.error('leaderboard-body element not found');
@@ -797,9 +801,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${i + 1}</td>
-                <td>${String(data[i].player)}</td>
+                <td>${data[i].player}</td>
                 <td>${data[i].score}</td>
             `;
+            if (username === data[i].player) {
+                row.classList.add('highlighted');
+            }
             leaderboardBody.appendChild(row);
         }
     }
@@ -847,6 +854,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             wins: leaderboard_wins,
             average_guesses: leaderboard_guesses
         };
+    }
+
+    async function getUsername(){
+        const response = await fetch('/get_username', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        return String(data.username);
     }
 
     newGame();

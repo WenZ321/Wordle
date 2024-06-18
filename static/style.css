@@ -68,21 +68,18 @@ p {
   animation: flashMessage 2s forwards;
 }
 
-@keyframes flashMessage {
-  0% {
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-100%);
-  }
+.message-disappearing {
+  opacity: 0;
+  transition: opacity 1s;
 }
+
+@keyframes flashMessage {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 
 
 .text{
@@ -599,10 +596,6 @@ p {
     margin-top: 20px;
 }
 
-.highlighted {
-    background-color: yellow; /* Highlight color */
-}
-
 .leaderboard-table th, .leaderboard-table td {
     border: 1px solid #444;
     padding: 10px;
@@ -614,6 +607,11 @@ p {
 
 .leaderboard-table td {
     background-color: #555;
+}
+
+.leaderboard-table tbody tr.highlighted td {
+    background-color: yellow; /* Highlight color */
+    color: black; /* Ensure the text color is readable */
 }
 
 .leaderboard-table tbody tr:nth-child(odd) {
