@@ -328,7 +328,7 @@ def choose_new_word_api():
             cur.execute("SELECT num_games FROM users WHERE username = ?", (username,))
             games = cur.fetchone()[0]
             average_guesses *= (games - 1)
-            cur.execute("UPDATE users SET average_guesses = ? WHERE username = ?", ((average_guesses + most_recent_guess) / games, username))
+            cur.execute("UPDATE users SET average_guesses = ? WHERE username = ?", (round((average_guesses + most_recent_guess) / games, 2), username))
             if win:
                 cur.execute("UPDATE users SET wins = ? WHERE username = ?", (wins + 1, username))
                 current_win_streak += 1
