@@ -47,9 +47,41 @@ p {
 
 #chatBox {
   position: absolute;
+  top: 10vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  max-width: 200px;
   font-size: 2vh;
-  margin-bottom: 25vh;
-  margin-left: 105vh;
+  text-align: center;
+  pointer-events: none; /* Ensure messages don't interfere with clicking */
+  z-index: 1000;
+}
+
+.message {
+  display: none;
+  margin-bottom: 1vh;
+  background-color: black;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  animation: flashMessage 2s forwards;
+}
+
+@keyframes flashMessage {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
 }
 
 

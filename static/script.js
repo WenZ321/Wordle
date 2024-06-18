@@ -119,6 +119,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const event = new Event('change');
     leaderboardSelect.dispatchEvent(event);
+    
+    let messageQueue = [];
+
+    function displayMessage(message) {
+      const chatBox = document.getElementById('chatBox');
+      const messageElement = document.createElement('div');
+      messageElement.className = 'message';
+      messageElement.textContent = message;
+
+      chatBox.appendChild(messageElement);
+      messageQueue.push(messageElement);
+
+      messageElement.style.display = 'block';
+
+      setTimeout(() => {
+        messageElement.style.opacity = '0';
+        setTimeout(() => {
+          chatBox.removeChild(messageElement);
+          messageQueue.shift();
+          updateMessagePositions();
+        }, 1000);
+      }, 2000);
+    }
+
+    function updateMessagePositions() {
+      messageQueue.forEach((message, index) => {
+        message.style.transform = `translateY(${index * 50}px)`;
+      });
+    }
 
     //reads the list of words
     await fetch('/static/words.txt')
@@ -501,14 +530,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.submitGuess = () => {
         if (currentGuess.length !== 5) {
             console.log("Please enter a 5-letter word.");
-            chatBox.textContent = "Please enter a 5-letter word.";
+            displayMessage("Please enter a 5-letter word.");
             shake();
             return; 
         }
     
         if (wordsArray.indexOf(currentGuess) === -1) {
             console.log("Not a valid 5-letter word!");
-            chatBox.textContent = "Not a valid 5-letter word!";
+            displayMessage("Not a valid 5-letter word!");
             shake();
             return; 
         }
@@ -524,14 +553,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     } else if (i === 3 || i === 4){
                         end = "th";
                     }
-                    console.log(i + 1 + end + " letter must be " + mustHave[i]);
+                    displayMessage(i + 1 + end + " letter must be " + mustHave[i]);
                     shake();
                     return;
                 }
             }
             for (let i = 0; i < mustContain.length; i++){
                 if (!currentGuess.includes(mustContain[i])){
-                    console.log("Guess must contain " + mustContain[i]);
+                    displayMessage("Guess must contain " + mustContain[i]);
                     shake();
                     return;
                 }
@@ -547,7 +576,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (currentGuess === randomWord) {
             updateColors(currentGuess);
-            chatBox.textContent = "You Win!";
+            displayMessage("You Win!");
             console.log("You Win!");
             currentAttempt++;
             guessed_words[randomWord] = currentAttempt;
@@ -570,7 +599,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentAttempt++;
             if (currentAttempt >= 6) {
                 console.log("Game over! The word was: " + randomWord);
-                chatBox.textContent = "Game over! The word was: " + randomWord;
+                displayMessage("Game over! The word was: " + randomWord);
                 guessed_words[randomWord] = 10;
                 possibleWords = possibleWords.filter(item => item !== randomWord);
                 disableKeyboard(); 
